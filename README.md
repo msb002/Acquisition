@@ -28,18 +28,18 @@ For any extended use of the software that will include the addition of new Vis a
 4. Create a Github account
 5. Once you have done so press 'fork' in the upper right of the page.
 6. Next, you need to clone the remote (github) repository onto your computer. Open Git Bash in windows and in the command prompt type `git clone https://github.com/yourusername/MHDlab`. Use yourusername = aspitarl if you did not create a github account.
-5. Type `cd MHDlab` in Git Bash to have enter your new repository.
+7. Type `cd MHDlab` in Git Bash to have enter your new repository.
 
 Once you have added any code or made changes, you should should get some basic knowledge of how to use git to stage and commit changes so those codes can be shared with the rest of the group. I recommend the [Git Book](https://git-scm.com/book/en/v2) 
 
 ## Setup 
-Once you have a folder setup, run setup.bat. 
+Once you have a folder setup, you will need to do some setup. 
 
-setup.bat does two things, some information about what it does in case there are errors: 
-
-* runs setup.py in python, which will install the mhdpy python package. Currently this is installed in 'develop' mode which allows for changes to the MHDpy module to show up without having to reinstall.
-
-* Runs `Common SubVis\Setup_GlobalVariable.vi`, which will update the repository path variable within `GlobalVariables.vi`
+1. Open an anaconda prompt as an administrator (type anaconda into the windows search bar and right click to open as administrator). 
+2. Navigate the prompt to your repository. Copy the local path to your repository and type 'cd <repository path>'. Note you have to right click and say paste or use Shift+Insert in the prompt. 
+3. type 'python setup.py develop'. develop is similar to 'install' but it will allow for you to change and use the mhdpy python package without having to run install again. 
+4. type 'python setup.py clean'.  This just cleans temporary setup files in your repository. 
+5. Next, open the 'Common SubVis' folder in windows and double click to run 'Setup_GlobalVariable.vi'. This will update the repository path that labview uses, which is contained within `GlobalVariables.vi`. 
 
 # Using MHDLab
 
