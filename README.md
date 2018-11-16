@@ -36,7 +36,7 @@ Once you have added any code or made changes, you should should get some basic k
 Once you have a folder setup, you will need to do some setup. 
 
 1. Open an anaconda prompt as an administrator (type anaconda into the windows search bar and right click to open as administrator). 
-2. Navigate the prompt to your repository. Copy the local path to your repository and type 'cd <repository path>'. Note you have to right click and say paste or use Shift+Insert in the prompt. 
+2. Navigate the prompt to your repository. Copy the local path to your repository and type `cd <repository path>`. Note you have to right click and say paste or use Shift+Insert in the prompt. 
 3. type `python setup.py develop`. `develop` is similar to `install` but it will allow for you to change and use the mhdpy python package without having to run install again. 
 4. type `python setup.py clean`.  This just cleans temporary setup files in your repository. 
 5. Next, open the 'Common SubVis' folder in windows and double click to run `Setup_GlobalVariable.vi`. This will update the repository path that labview uses, which is contained within `GlobalVariables.vi`. 
