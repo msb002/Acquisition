@@ -30,7 +30,8 @@ REQUIRED = [
 'nptdms',
 'pytz',
 'pyqt5',
-'pyqt5-tools'
+'pyqt5-tools',
+'tzlocal'
 ]
 
 # What packages are optional?
