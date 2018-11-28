@@ -31,10 +31,97 @@ import threading
 def set_settings(experiment,settings):
     experiment.SetValue(CameraSettings.ReadoutControlAccumulations, settings['Accumulations'])
 
+    experiment.SetValue(CameraSettings.GatingMode,settings['GatingMode'])
+    if settings['GatingMode'] == 1: #repetitive
+        set_repetitive_gate(experiment, settings['GatingRepetitiveGate_Width'],settings['GatingRepetitiveGate_Delay'])
+    elif settings['GatingMode'] == 2: #sequential
+        set_sequential_gating(experiment, settings['GatingSequentialStartingGate_Width'], settings['GatingSequentialStartingGate_Delay'], settings['GatingSequentialEndingGate_Width'], settings['GatingSequentialEndingGate_Delay'])
+
+    experiment.SetValue(ExperimentSettings.AcquisitionFramesToStore,settings['NumFrames'])
+    experiment.SetValue(ExperimentSettings.OnlineProcessingFrameCombinationFramesCombined,settings['ExposuresPerFrame'])
 def get_settings(experiment):
     settings = {}
     settings['Accumulations'] = experiment.GetValue(CameraSettings.ReadoutControlAccumulations)
+
+    settings['GatingMode'] = experiment.GetValue(CameraSettings.GatingMode)
+    settings['GatingRepetitiveGate_Delay'] = experiment.GetValue(CameraSettings.GatingRepetitiveGate).Delay
+    settings['GatingRepetitiveGate_Width'] = experiment.GetValue(CameraSettings.GatingRepetitiveGate).Width
+    settings['GatingSequentialEndingGate_Delay'] = experiment.GetValue(CameraSettings.GatingSequentialEndingGate).Delay
+    settings['GatingSequentialStartingGate_Delay'] = experiment.GetValue(CameraSettings.GatingSequentialStartingGate).Delay
+    settings['GatingSequentialEndingGate_Width'] = experiment.GetValue(CameraSettings.GatingSequentialEndingGate).Width
+    settings['GatingSequentialStartingGate_Width'] = experiment.GetValue(CameraSettings.GatingSequentialStartingGate).Width
+
+    settings['NumFrames'] = experiment.GetValue(ExperimentSettings.AcquisitionFramesToStore)
+    settings['ExposuresPerFrame'] = experiment.GetValue(ExperimentSettings.OnlineProcessingFrameCombinationFramesCombined)
+    
+    # settings['CenterWavelength'] = experiment.GetValue(SpectrometerSettings.GratingCenterWavelength)    
+    # settings['Grating'] = experiment.GetValue(SpectrometerSettings.Grating)    
     return settings 
+
+def read_settings(filepath):
+    with open(filepath) as fp:
+        settingsdict = json.load(fp)
+    return settingsdict
+
+def write_setting(filepath,setting, name):
+    settings = read_settings(filepath)
+    settings[name] = setting
+    with open(filepath , 'w') as fp:
+        json.dump(settings, fp)
+    
+
+def set_repetitive_gate(experiment, width, delay):
+    # Check Gating Mode existence
+    if (experiment.Exists(CameraSettings.GatingMode)):
+
+        # Set repetitive gating mode
+        experiment.SetValue(CameraSettings.GatingMode, GatingMode.Repetitive)  
+        
+        pulses = []
+
+        # Add PI Pulse type with parameters to pulser list
+        pulses.append(Pulse(width,delay))
+
+        # Set repetitive gate
+        experiment.SetValue(
+            CameraSettings.GatingRepetitiveGate,
+            pulses[0])
+    else:
+        print("System not capable of Gating Mode")
+        
+def set_sequential_gating(experiment, starting_width, starting_delay, ending_width, ending_delay):
+    # Check Gating Mode existence
+    if (experiment.Exists(CameraSettings.GatingMode)):
+
+        # Set sequential gating mode
+        experiment.SetValue(CameraSettings.GatingMode, 
+                            GatingMode.Sequential)   
+        
+        pulser = []
+
+        # Add PI Pulse type with parameters to pulser list
+        pulser.append(Pulse(starting_width, starting_delay))
+
+        # Add PI Pulse type with parameters to pulser list
+        pulser.append(Pulse(ending_width,ending_delay))      
+
+        # Set sequential starting gate
+        experiment.SetValue(
+            CameraSettings.GatingSequentialStartingGate,
+            pulser[0])
+
+        # Set sequential ending gate
+        experiment.SetValue(
+            CameraSettings.GatingSequentialEndingGate,
+            pulser[1])
+    else:
+        print("System not capable of Gating Mode")
+        
+
+def set_sequential_gating_num(experiment, width, starting_delay,numframes):
+    experiment.SetValue(ExperimentSettings.AcquisitionFramesToStore,numframes)
+    ending_delay = starting_delay + width*numframes
+    set_sequential_gating(experiment, width, starting_delay, width, ending_delay)
 
 class LFexp():
     def __init__(self, expname):
@@ -76,3 +163,5 @@ class FilePathThread(threading.Thread):
     
     def exit(self):
         self.runthread = False
+
+
