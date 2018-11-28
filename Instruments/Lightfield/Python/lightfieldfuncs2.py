@@ -88,8 +88,7 @@ def set_repetitive_gate(experiment, width, delay):
     else:
         print("System not capable of Gating Mode")
         
-def set_sequential_gating(experiment, starting_width, starting_delay,
-                   ending_width, ending_delay):
+def set_sequential_gating(experiment, starting_width, starting_delay, ending_width, ending_delay):
     # Check Gating Mode existence
     if (experiment.Exists(CameraSettings.GatingMode)):
 
@@ -140,3 +139,8 @@ class FilePathThread(threading.Thread):
     
     def exit(self):
         self.runthread = False
+
+def set_sequential_gating_num(experiment, width, starting_delay,numframes):
+    experiment.SetValue(ExperimentSettings.AcquisitionFramesToStore,numframes)
+    ending_delay = starting_delay + width*numframes
+    set_sequential_gating(experiment, width, starting_delay, width, ending_delay)
