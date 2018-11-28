@@ -35,6 +35,9 @@ def set_settings(experiment,settings):
         set_repetitive_gate(experiment, settings['GatingRepetitiveGate_Width'],settings['GatingRepetitiveGate_Delay'])
     elif settings['GatingMode'] == 2: #sequential
         set_sequential_gating(experiment, settings['GatingSequentialStartingGate_Width'], settings['GatingSequentialStartingGate_Delay'], settings['GatingSequentialEndingGate_Width'], settings['GatingSequentialEndingGate_Delay'])
+
+    experiment.SetValue(ExperimentSettings.AcquisitionFramesToStore,settings['NumFrames'])
+    experiment.SetValue(ExperimentSettings.OnlineProcessingFrameCombinationFramesCombined,settings['ExposuresPerFrame'])
 def get_settings(experiment):
     settings = {}
     settings['Accumulations'] = experiment.GetValue(CameraSettings.ReadoutControlAccumulations)
@@ -48,6 +51,10 @@ def get_settings(experiment):
     settings['GatingSequentialStartingGate_Width'] = experiment.GetValue(CameraSettings.GatingSequentialStartingGate).Width
 
     settings['NumFrames'] = experiment.GetValue(ExperimentSettings.AcquisitionFramesToStore)
+    settings['ExposuresPerFrame'] = experiment.GetValue(ExperimentSettings.OnlineProcessingFrameCombinationFramesCombined)
+    
+    # settings['CenterWavelength'] = experiment.GetValue(SpectrometerSettings.GratingCenterWavelength)    
+    # settings['Grating'] = experiment.GetValue(SpectrometerSettings.Grating)    
     return settings 
 
 def read_settings(filepath):
