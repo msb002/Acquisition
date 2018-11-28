@@ -19,12 +19,12 @@ from PrincetonInstruments.LightField.Automation import Automation
 from PrincetonInstruments.LightField.AddIns import Pulse 
 
 
-from lightfieldfuncs2 import get_settings, set_settings, FilePathThread
+from lightfieldfuncs2 import get_settings, set_settings, FilePathThread, read_settings, write_setting
             
 curfolder = os.path.dirname(os.path.realpath(__file__))
 filepath = os.path.join(curfolder,"settings.json")
-with open(filepath) as fp:
-    settingsdict = json.load(fp)
+stdict = read_settings(filepath)
+
 
 auto = Automation(True, List[String]())
 experiment = auto.LightFieldApplication.Experiment

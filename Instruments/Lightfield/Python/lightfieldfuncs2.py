@@ -3,7 +3,8 @@ import clr
 import sys
 import os
 import mhdpy
-import time
+import time 
+import json
 
 from System.IO import * # Import System.IO for saving and opening files
 from System import String # Import C compatible List and String
@@ -45,8 +46,21 @@ def get_settings(experiment):
     settings['GatingSequentialStartingGate_Delay'] = experiment.GetValue(CameraSettings.GatingSequentialStartingGate).Delay
     settings['GatingSequentialEndingGate_Width'] = experiment.GetValue(CameraSettings.GatingSequentialEndingGate).Width
     settings['GatingSequentialStartingGate_Width'] = experiment.GetValue(CameraSettings.GatingSequentialStartingGate).Width
+
+    settings['NumFrames'] = experiment.GetValue(ExperimentSettings.AcquisitionFramesToStore)
     return settings 
 
+def read_settings(filepath):
+    with open(filepath) as fp:
+        settingsdict = json.load(fp)
+    return settingsdict
+
+def write_setting(filepath,setting, name):
+    settings = read_settings(filepath)
+    settings[name] = setting
+    with open(filepath , 'w') as fp:
+        json.dump(settings, fp)
+    
 
 def set_repetitive_gate(experiment, width, delay):
     # Check Gating Mode existence
