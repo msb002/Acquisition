@@ -1,4 +1,4 @@
 {
-    "A" : {"Accumulations" : 100}, 
-    "B" : {"Accumulations" : 1000}
+    "A" : {"Accumulations": 100, "GatingMode": 1, "GatingRepetitiveGate": 200.0, "GatingSequentialEndingGate": 5900.0, "GatingSequentialStartingGate": 200.0}, 
+    "B" : {"Accumulations": 100, "GatingMode": 1, "GatingRepetitiveGate": 200.0, "GatingSequentialEndingGate": 5900.0, "GatingSequentialStartingGate": 200.0}
 }

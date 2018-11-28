@@ -16,7 +16,10 @@ clr.AddReference('PrincetonInstruments.LightField.AutomationV5')
 clr.AddReference('PrincetonInstruments.LightFieldAddInSupportServices')
 from PrincetonInstruments.LightField.Automation import Automation
 
-from lightfieldfuncs import get_settings, set_settings, FilePathThread
+from PrincetonInstruments.LightField.AddIns import Pulse 
+
+
+from lightfieldfuncs2 import get_settings, set_settings, FilePathThread
             
 curfolder = os.path.dirname(os.path.realpath(__file__))
 filepath = os.path.join(curfolder,"settings.json")
@@ -26,12 +29,12 @@ with open(filepath) as fp:
 auto = Automation(True, List[String]())
 experiment = auto.LightFieldApplication.Experiment
 experiment.Load("TestCamera")
-fpthread = FilePathThread(experiment)
-fpthread.start()
+# fpthread = FilePathThread(experiment)
+# fpthread.start()
 
 
-auto2 = Automation(True, List[String]())
-experiment2 = auto2.LightFieldApplication.Experiment
-experiment2.Load("TestCamera2")
-fpthread2 = FilePathThread(experiment2)
-fpthread2.start()
+# auto2 = Automation(True, List[String]())
+# experiment2 = auto2.LightFieldApplication.Experiment
+# experiment2.Load("TestCamera2")
+# fpthread2 = FilePathThread(experiment2)
+# fpthread2.start()
