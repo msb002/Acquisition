@@ -70,6 +70,8 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.pushButton_pullexp1.clicked.connect(lambda : self.pull_settings(self.exp1.exp))
         self.pushButton_pullexp2.clicked.connect(lambda : self.pull_settings(self.exp2.exp))
 
+        self.pushButton_calcgate.clicked.connect(self.calc_gateparams)
+
     def start(self):
         exp1name = self.lineEdit_exp1name.text()
         exp2name = self.lineEdit_exp2name.text()
@@ -98,12 +100,28 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.settings_elements.setText(settingliststr)
         self.lineEdit_settingname.setText(settingname)
 
+        self.lineEdit_gatestart.setText(str(int(setting['GatingSequentialStartingGate_Delay'])))
+        #self.lineEdit_gateend.setText(setting['GatingSequentialEndingGate_Delay'])
+        self.lineEdit_gatewidth.setText(str(int(setting['GatingSequentialStartingGate_Width'])))
+        self.lineEdit_numframes.setText(str(int(setting['NumFrames'])))
+        self.calc_gateparams()
+
     def pull_settings(self,experiment):
         setting = lf.get_settings(experiment)
         settingname = self.comboBox_settingname.currentText()
         self.settings[settingname] = setting
         self.settingname_updated()
 
+    def calc_gateparams(self):
+        start = int(self.lineEdit_gatestart.text())
+        num = int(self.lineEdit_numframes.text())
+        width = int(self.lineEdit_gatewidth.text())
+
+        end = start + num*width
+
+        self.lineEdit_gateend.setText(str(end))
+
+        
 
 app = QtWidgets.QApplication(sys.argv)
 
