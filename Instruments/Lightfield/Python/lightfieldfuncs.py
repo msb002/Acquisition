@@ -57,18 +57,7 @@ def get_settings(experiment):
     # settings['CenterWavelength'] = experiment.GetValue(SpectrometerSettings.GratingCenterWavelength)    
     # settings['Grating'] = experiment.GetValue(SpectrometerSettings.Grating)    
     return settings 
-
-def read_settings(filepath):
-    with open(filepath) as fp:
-        settingsdict = json.load(fp)
-    return settingsdict
-
-def write_setting(filepath,setting, name):
-    settings = read_settings(filepath)
-    settings[name] = setting
-    with open(filepath , 'w') as fp:
-        json.dump(settings, fp)
-    
+   
 
 def set_repetitive_gate(experiment, width, delay):
     # Check Gating Mode existence
@@ -129,15 +118,9 @@ class LFexp():
         self.exp = self.auto.LightFieldApplication.Experiment
         self.exp.Load(expname)
         self.name = expname
-        curfolder = os.path.dirname(os.path.realpath(__file__))
-        filepath = os.path.join(curfolder,"settings.json")
-        with open(filepath) as fp:
-            self.settingsdict = json.load(fp)
 
-    def setting(self,key):
-        set_settings(self.exp, self.settingsdict[key])
-
-
+    def set_setting(self,setting):
+        set_settings(self.exp, setting)
 
 
 class FilePathThread(threading.Thread):

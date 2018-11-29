@@ -47,7 +47,9 @@ class Ui_MainWindow(layout.Ui_MainWindow):
                 print('Could not read settings')
                 self.settings = {}
         
-        
+    def save(self):
+        with open(self.settingspath , 'w') as fp:
+            json.dump(self.settings, fp)
     
     def setup(self):
         """links internal function to the various widgets in the main window"""
@@ -69,8 +71,12 @@ class Ui_MainWindow(layout.Ui_MainWindow):
 
         self.pushButton_pullexp1.clicked.connect(lambda : self.pull_settings(self.exp1.exp))
         self.pushButton_pullexp2.clicked.connect(lambda : self.pull_settings(self.exp2.exp))
+        self.pushButton_sendexp1.clicked.connect(lambda : self.send_settings(self.exp1.exp))
+        self.pushButton_sendexp2.clicked.connect(lambda : self.send_settings(self.exp2.exp))
 
         self.pushButton_calcgate.clicked.connect(self.calc_gateparams)
+        self.pushButton_updategate.clicked.connect(self.update_gateparams)
+        self.pushButton_save.clicked.connect(self.save)
 
     def start(self):
         exp1name = self.lineEdit_exp1name.text()
@@ -121,7 +127,19 @@ class Ui_MainWindow(layout.Ui_MainWindow):
 
         self.lineEdit_gateend.setText(str(end))
 
-        
+    def update_gateparams(self):
+        settingname = self.comboBox_settingname.currentText()
+        self.settings[settingname]['GatingSequentialStartingGate_Delay'] =  int(self.lineEdit_gatestart.text())
+        self.settings[settingname]['GatingSequentialStartingGate_Width'] =  int(self.lineEdit_gatewidth.text())
+        self.settings[settingname]['GatingSequentialEndingGate_Delay'] =  int(self.lineEdit_gateend.text())
+        self.settings[settingname]['GatingSequentialEndingGate_Width'] =  int(self.lineEdit_gatewidth.text())
+        self.settings[settingname]['NumFrames'] =  int(self.lineEdit_numframes.text())
+        self.settingname_updated()
+
+    def send_settings(self,experiment):
+        settingname = self.comboBox_settingname.currentText()
+        setting = self.settings[settingname]
+        lf.set_settings(experiment,setting)
 
 app = QtWidgets.QApplication(sys.argv)
 
