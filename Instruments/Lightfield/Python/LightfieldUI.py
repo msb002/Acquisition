@@ -31,6 +31,9 @@ progname = os.path.basename(sys.argv[0]) #What is this?
 progfolder = os.path.dirname(sys.argv[0])
 progversion = "0.1"
 
+experimentsfolder = 'C:\\Users\\aspitarl\\Documents\\LightField\\Experiments'
+import os
+
 import layout
 class Ui_MainWindow(layout.Ui_MainWindow):
     """Main window of the post processor. Inherits from the MainWindow class within layout.py"""
@@ -47,10 +50,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
                 print('Could not read settings')
                 self.settings = {}
         
-    def save(self):
-        with open(self.settingspath , 'w') as fp:
-            json.dump(self.settings, fp)
-    
+
     def setup(self):
         """links internal function to the various widgets in the main window"""
         self.pushButton_start.clicked.connect(self.start)
@@ -59,8 +59,12 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.settingname_updated()
         self.comboBox_settingname.currentIndexChanged.connect(self.settingname_updated)
 
-        self.lineEdit_exp1name.setText("TestCamera")
-        self.lineEdit_exp2name.setText("TestCamera2")
+        onlyfiles = [f for f in os.listdir(experimentsfolder) if os.path.isfile(os.path.join(experimentsfolder, f))]
+        experimentlist = [os.path.splitext(f)[0] for f in onlyfiles]
+        self.comboBox_exp1.insertItems(0,experimentlist)
+        self.comboBox_exp2.insertItems(0,experimentlist)
+        if(len(experimentlist)>1):
+            self.comboBox_exp2.setCurrentIndex(1)
 
         regex = QtCore.QRegExp("[0-9_]+")
         validator = QtGui.QRegExpValidator(regex)
@@ -69,18 +73,18 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.lineEdit_numframes.setValidator(validator)
         self.lineEdit_gatewidth.setValidator(validator)
 
-        self.pushButton_pullexp1.clicked.connect(lambda : self.pull_settings(self.exp1.exp))
-        self.pushButton_pullexp2.clicked.connect(lambda : self.pull_settings(self.exp2.exp))
-        self.pushButton_sendexp1.clicked.connect(lambda : self.send_settings(self.exp1.exp))
-        self.pushButton_sendexp2.clicked.connect(lambda : self.send_settings(self.exp2.exp))
+        self.pushButton_pullexp1.clicked.connect(lambda : self.pull_settings('exp1'))
+        self.pushButton_pullexp2.clicked.connect(lambda : self.pull_settings('exp2'))
+        self.pushButton_sendexp1.clicked.connect(lambda : self.send_settings('exp1'))
+        self.pushButton_sendexp2.clicked.connect(lambda : self.send_settings('exp2'))
 
         self.pushButton_calcgate.clicked.connect(self.calc_gateparams)
         self.pushButton_updategate.clicked.connect(self.update_gateparams)
         self.pushButton_save.clicked.connect(self.save)
 
     def start(self):
-        exp1name = self.lineEdit_exp1name.text()
-        exp2name = self.lineEdit_exp2name.text()
+        exp1name = self.comboBox_exp1.currentText()
+        exp2name = self.comboBox_exp2.currentText()
         exparr = []
 
         if(exp1name != ""):
@@ -112,11 +116,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.lineEdit_numframes.setText(str(int(setting['NumFrames'])))
         self.calc_gateparams()
 
-    def pull_settings(self,experiment):
-        setting = lf.get_settings(experiment)
-        settingname = self.comboBox_settingname.currentText()
-        self.settings[settingname] = setting
-        self.settingname_updated()
+
 
     def calc_gateparams(self):
         start = int(self.lineEdit_gatestart.text())
@@ -136,11 +136,31 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.settings[settingname]['NumFrames'] =  int(self.lineEdit_numframes.text())
         self.settingname_updated()
 
-    def send_settings(self,experiment):
-        settingname = self.comboBox_settingname.currentText()
-        setting = self.settings[settingname]
-        lf.set_settings(experiment,setting)
+    def send_settings(self,expstr):
+        if hasattr(self,expstr):
+            if expstr == "exp1":
+                experiment = self.exp1.exp
+            elif expstr == "exp2":
+                experiment = self.exp2.exp
+            settingname = self.comboBox_settingname.currentText()
+            setting = self.settings[settingname]
+            lf.set_settings(experiment,setting)
 
+    def pull_settings(self,expstr):
+        if hasattr(self,expstr):
+            if expstr == "exp1":
+                experiment = self.exp1.exp
+            elif expstr == "exp2":
+                experiment = self.exp2.exp
+            setting = lf.get_settings(experiment)
+            settingname = self.comboBox_settingname.currentText()
+            self.settings[settingname] = setting
+            self.settingname_updated()
+
+    def save(self):
+        with open(self.settingspath , 'w') as fp:
+            json.dump(self.settings, fp)
+    
 app = QtWidgets.QApplication(sys.argv)
 
 MainWindow = QtWidgets.QMainWindow()

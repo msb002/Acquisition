@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'layout.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.2
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -19,11 +19,6 @@ class Ui_MainWindow(object):
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(30, 15, 81, 16))
         self.label.setObjectName("label")
-        self.lineEdit_exp1name = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit_exp1name.setEnabled(True)
-        self.lineEdit_exp1name.setGeometry(QtCore.QRect(10, 35, 113, 22))
-        self.lineEdit_exp1name.setText("")
-        self.lineEdit_exp1name.setObjectName("lineEdit_exp1name")
         self.comboBox_settingname = QtWidgets.QComboBox(self.centralwidget)
         self.comboBox_settingname.setGeometry(QtCore.QRect(150, 30, 161, 22))
         self.comboBox_settingname.setObjectName("comboBox_settingname")
@@ -48,13 +43,8 @@ class Ui_MainWindow(object):
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
         self.pushButton_start = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_start.setGeometry(QtCore.QRect(10, 120, 111, 28))
+        self.pushButton_start.setGeometry(QtCore.QRect(20, 120, 111, 28))
         self.pushButton_start.setObjectName("pushButton_start")
-        self.lineEdit_exp2name = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit_exp2name.setEnabled(True)
-        self.lineEdit_exp2name.setGeometry(QtCore.QRect(10, 80, 113, 22))
-        self.lineEdit_exp2name.setText("")
-        self.lineEdit_exp2name.setObjectName("lineEdit_exp2name")
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
         self.label_6.setGeometry(QtCore.QRect(30, 60, 81, 16))
         self.label_6.setObjectName("label_6")
@@ -108,6 +98,12 @@ class Ui_MainWindow(object):
         self.settings_elements = QtWidgets.QTextBrowser(self.centralwidget)
         self.settings_elements.setGeometry(QtCore.QRect(150, 80, 161, 91))
         self.settings_elements.setObjectName("settings_elements")
+        self.comboBox_exp1 = QtWidgets.QComboBox(self.centralwidget)
+        self.comboBox_exp1.setGeometry(QtCore.QRect(10, 30, 121, 22))
+        self.comboBox_exp1.setObjectName("comboBox_exp1")
+        self.comboBox_exp2 = QtWidgets.QComboBox(self.centralwidget)
+        self.comboBox_exp2.setGeometry(QtCore.QRect(10, 80, 121, 22))
+        self.comboBox_exp2.setObjectName("comboBox_exp2")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
