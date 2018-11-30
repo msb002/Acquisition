@@ -31,7 +31,7 @@ progname = os.path.basename(sys.argv[0]) #What is this?
 progfolder = os.path.dirname(sys.argv[0])
 progversion = "0.1"
 
-experimentsfolder = 'C:\\Users\\aspitarl\\Documents\\LightField\\Experiments'
+experimentsfolder = 'C:\\Users\\aspit\\Documents\\LightField\\Experiments'
 import os
 
 import layout
@@ -61,6 +61,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
 
         onlyfiles = [f for f in os.listdir(experimentsfolder) if os.path.isfile(os.path.join(experimentsfolder, f))]
         experimentlist = [os.path.splitext(f)[0] for f in onlyfiles]
+        experimentlist.append("")
         self.comboBox_exp1.insertItems(0,experimentlist)
         self.comboBox_exp2.insertItems(0,experimentlist)
         if(len(experimentlist)>1):
