@@ -133,17 +133,25 @@ class FilePathThread(threading.Thread):
     def run(self):
         self.LabVIEW = win32com.client.Dispatch("Labview.Application") # when start is called a new thread is created and the COM object must be created in that thread
         self.fileinfo = ""
+        for i, exp in enumerate(self.explist):
+            logfile = self.logfilearr[i]
+            filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
+            folder = os.path.split(filepath)[0]
+            filename = os.path.split(filepath)[1]
+            exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
+            exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
         while(self.runthread):
             self.fileinfonew = mhdpy.daq.get_fileinfo(self.LabVIEW )
             if(self.fileinfonew != self.fileinfo):
                 self.fileinfo = self.fileinfonew
                 for i, exp in enumerate(self.explist):
                     logfile = self.logfilearr[i]
-                    filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
-                    folder = os.path.split(filepath)[0]
-                    filename = os.path.split(filepath)[1]
-                    exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
-                    exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
+                    if not logfile:
+                        filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
+                        folder = os.path.split(filepath)[0]
+                        filename = os.path.split(filepath)[1]
+                        exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
+                        exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
             time.sleep(0.1)
     
     def exit(self):

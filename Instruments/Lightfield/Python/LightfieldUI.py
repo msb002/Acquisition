@@ -92,16 +92,14 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         exparr = []
         logfilearr = []
         if(exp1name != ""):
-            logfilearr.append(self.checkBox_logfileexp1.checkState())
-            
+            logfilearr.append(bool(self.checkBox_logfileexp1.checkState()))
             self.exp1 = lf.LFexp(exp1name)
             exparr.append(self.exp1)
         if(exp2name != ""):
-            logfilearr.append(self.checkBox_logfileexp2.checkState())
+            logfilearr.append(bool(self.checkBox_logfileexp2.checkState()))
             self.exp2 = lf.LFexp(exp2name)
             exparr.append(self.exp2)
 
-        
         fpthread = lf.FilePathThread(exparr,logfilearr)
         fpthread.start()
 
@@ -175,6 +173,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
             self.lt.start()
         else:
             self.lt.logging = False
+            self.exp2.exp.Stop()
 
 
 
