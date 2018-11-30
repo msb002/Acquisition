@@ -14,24 +14,16 @@ sys.path.append(os.environ['LIGHTFIELD_ROOT']+"\\AddInViews")
 clr.AddReference('PrincetonInstruments.LightFieldViewV5')
 clr.AddReference('PrincetonInstruments.LightField.AutomationV5')
 clr.AddReference('PrincetonInstruments.LightFieldAddInSupportServices')
-from PrincetonInstruments.LightField.Automation import Automation
 
-from lightfieldfuncs import get_settings, set_settings, FilePathThread
+from lightfieldfuncs import LFexp, FilePathThread, get_settings, set_settings, FilePathThread, read_settings, write_setting, set_sequential_gating_num
+            
+
+tc1 = LFexp("TestCamera")
+tc2 = LFexp("TestCamera2")
             
 curfolder = os.path.dirname(os.path.realpath(__file__))
 filepath = os.path.join(curfolder,"settings.json")
-with open(filepath) as fp:
-    settingsdict = json.load(fp)
+stdict = read_settings(filepath)
 
-auto = Automation(True, List[String]())
-experiment = auto.LightFieldApplication.Experiment
-experiment.Load("TestCamera")
-fpthread = FilePathThread(experiment)
+fpthread = FilePathThread([tc1,tc2])
 fpthread.start()
-
-
-auto2 = Automation(True, List[String]())
-experiment2 = auto2.LightFieldApplication.Experiment
-experiment2.Load("TestCamera2")
-fpthread2 = FilePathThread(experiment2)
-fpthread2.start()
