@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'layout.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,13 +11,13 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(480, 266)
+        MainWindow.resize(475, 307)
         MainWindow.setStatusTip("")
         MainWindow.setAccessibleName("")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(30, 15, 81, 16))
+        self.label.setGeometry(QtCore.QRect(30, 5, 81, 16))
         self.label.setObjectName("label")
         self.comboBox_settingname = QtWidgets.QComboBox(self.centralwidget)
         self.comboBox_settingname.setGeometry(QtCore.QRect(150, 30, 161, 22))
@@ -43,10 +43,10 @@ class Ui_MainWindow(object):
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
         self.pushButton_start = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_start.setGeometry(QtCore.QRect(20, 120, 111, 28))
+        self.pushButton_start.setGeometry(QtCore.QRect(20, 140, 111, 28))
         self.pushButton_start.setObjectName("pushButton_start")
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
-        self.label_6.setGeometry(QtCore.QRect(30, 60, 81, 16))
+        self.label_6.setGeometry(QtCore.QRect(30, 70, 81, 16))
         self.label_6.setObjectName("label_6")
         self.line_2 = QtWidgets.QFrame(self.centralwidget)
         self.line_2.setGeometry(QtCore.QRect(130, -3, 20, 181))
@@ -99,11 +99,25 @@ class Ui_MainWindow(object):
         self.settings_elements.setGeometry(QtCore.QRect(150, 80, 161, 91))
         self.settings_elements.setObjectName("settings_elements")
         self.comboBox_exp1 = QtWidgets.QComboBox(self.centralwidget)
-        self.comboBox_exp1.setGeometry(QtCore.QRect(10, 30, 121, 22))
+        self.comboBox_exp1.setGeometry(QtCore.QRect(10, 20, 121, 22))
         self.comboBox_exp1.setObjectName("comboBox_exp1")
         self.comboBox_exp2 = QtWidgets.QComboBox(self.centralwidget)
-        self.comboBox_exp2.setGeometry(QtCore.QRect(10, 80, 121, 22))
+        self.comboBox_exp2.setGeometry(QtCore.QRect(10, 90, 121, 22))
         self.comboBox_exp2.setObjectName("comboBox_exp2")
+        self.checkBox_logfileexp1 = QtWidgets.QCheckBox(self.centralwidget)
+        self.checkBox_logfileexp1.setGeometry(QtCore.QRect(32, 46, 81, 20))
+        self.checkBox_logfileexp1.setObjectName("checkBox_logfileexp1")
+        self.checkBox_logfileexp2 = QtWidgets.QCheckBox(self.centralwidget)
+        self.checkBox_logfileexp2.setGeometry(QtCore.QRect(30, 115, 81, 20))
+        self.checkBox_logfileexp2.setObjectName("checkBox_logfileexp2")
+        self.line_3 = QtWidgets.QFrame(self.centralwidget)
+        self.line_3.setGeometry(QtCore.QRect(0, 240, 481, 16))
+        self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
+        self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_3.setObjectName("line_3")
+        self.radioButton_contacq = QtWidgets.QRadioButton(self.centralwidget)
+        self.radioButton_contacq.setGeometry(QtCore.QRect(16, 256, 191, 20))
+        self.radioButton_contacq.setObjectName("radioButton_contacq")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -142,6 +156,9 @@ class Ui_MainWindow(object):
         self.pushButton_updategate.setText(_translate("MainWindow", "Update Setting"))
         self.pushButton_pullexp2.setText(_translate("MainWindow", "Pull from Experiment 2"))
         self.pushButton_save.setText(_translate("MainWindow", "Save"))
+        self.checkBox_logfileexp1.setText(_translate("MainWindow", "Logfile?"))
+        self.checkBox_logfileexp2.setText(_translate("MainWindow", "Logfile?"))
+        self.radioButton_contacq.setText(_translate("MainWindow", "Continuous Acquisition Exp 2"))
         self.actionOpen.setText(_translate("MainWindow", "Open Logfile"))
         self.actionReload_ppr.setText(_translate("MainWindow", "Reload PPR"))
         self.actionOpen_Eventlog.setText(_translate("MainWindow", "Open Eventlog"))

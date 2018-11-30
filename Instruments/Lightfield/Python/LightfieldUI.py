@@ -10,6 +10,7 @@ import clr # Import the .NET class library
 import sys
 import os
 import json
+import time
 
 
 from System.IO import * # Import System.IO for saving and opening files
@@ -83,19 +84,25 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.pushButton_updategate.clicked.connect(self.update_gateparams)
         self.pushButton_save.clicked.connect(self.save)
 
+        self.radioButton_contacq.released.connect(self.continuousacq)
+
     def start(self):
         exp1name = self.comboBox_exp1.currentText()
         exp2name = self.comboBox_exp2.currentText()
         exparr = []
-
+        logfilearr = []
         if(exp1name != ""):
+            logfilearr.append(self.checkBox_logfileexp1.checkState())
+            
             self.exp1 = lf.LFexp(exp1name)
             exparr.append(self.exp1)
         if(exp2name != ""):
+            logfilearr.append(self.checkBox_logfileexp2.checkState())
             self.exp2 = lf.LFexp(exp2name)
             exparr.append(self.exp2)
 
-        fpthread = lf.FilePathThread(exparr)
+        
+        fpthread = lf.FilePathThread(exparr,logfilearr)
         fpthread.start()
 
     def settingname_updated(self):
@@ -161,6 +168,16 @@ class Ui_MainWindow(layout.Ui_MainWindow):
     def save(self):
         with open(self.settingspath , 'w') as fp:
             json.dump(self.settings, fp)
+
+    def continuousacq(self):
+        if(self.radioButton_contacq.isChecked()):
+            self.lt = lf.LoggingThread(self.exp2.exp)
+            self.lt.start()
+        else:
+            self.lt.logging = False
+
+
+
     
 app = QtWidgets.QApplication(sys.argv)
 
