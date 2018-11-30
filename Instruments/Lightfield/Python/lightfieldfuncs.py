@@ -107,7 +107,7 @@ def set_sequential_gating(experiment, starting_width, starting_delay, ending_wid
         print("System not capable of Gating Mode")
         
 
-def set_sequential_gating_num(experiment, width, starting_delay,numframes):
+def set_simpoequential_gating_num(experiment, width, starting_delay,numframes):
     experiment.SetValue(ExperimentSettings.AcquisitionFramesToStore,numframes)
     ending_delay = starting_delay + width*numframes
     set_sequential_gating(experiment, width, starting_delay, width, ending_delay)
@@ -124,27 +124,51 @@ class LFexp():
 
 
 class FilePathThread(threading.Thread):
-    def __init__(self,explist, logfile = False):
+    def __init__(self,explist, logfilearr):
         threading.Thread.__init__(self)
         self.explist= explist 
         self.runthread = True
+        self.logfilearr = logfilearr
 
     def run(self):
         self.LabVIEW = win32com.client.Dispatch("Labview.Application") # when start is called a new thread is created and the COM object must be created in that thread
         self.fileinfo = ""
+        for i, exp in enumerate(self.explist):
+            logfile = self.logfilearr[i]
+            filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
+            folder = os.path.split(filepath)[0]
+            filename = os.path.split(filepath)[1]
+            exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
+            exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
         while(self.runthread):
             self.fileinfonew = mhdpy.daq.get_fileinfo(self.LabVIEW )
             if(self.fileinfonew != self.fileinfo):
                 self.fileinfo = self.fileinfonew
-                for exp in self.explist:
-                    filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'')
-                    folder = os.path.split(filepath)[0]
-                    filename = os.path.split(filepath)[1]
-                    exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
-                    exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
+                for i, exp in enumerate(self.explist):
+                    logfile = self.logfilearr[i]
+                    if not logfile:
+                        filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
+                        folder = os.path.split(filepath)[0]
+                        filename = os.path.split(filepath)[1]
+                        exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
+                        exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
             time.sleep(0.1)
     
     def exit(self):
         self.runthread = False
 
+class LoggingThread(threading.Thread):
+    def __init__(self,experiment):
+        threading.Thread.__init__(self)
+        self.experiment = experiment
+        self.logging = False
 
+    def run(self):
+        self.logging = True
+        while(self.logging):
+            self.experiment.Acquire()
+            while(self.experiment.IsRunning):
+                time.sleep(0.1)
+        
+
+# exp1 = LFexp('TestCamera')
