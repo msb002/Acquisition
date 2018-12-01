@@ -11,17 +11,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(476, 398)
+        MainWindow.resize(706, 394)
         MainWindow.setStatusTip("")
         MainWindow.setAccessibleName("")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.mplframe = QtWidgets.QWidget(self.centralwidget)
-        self.mplframe.setGeometry(QtCore.QRect(10, 10, 451, 341))
+        self.mplframe.setGeometry(QtCore.QRect(10, 10, 681, 371))
         self.mplframe.setObjectName("mplframe")
-        self.pushButton_update = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_update.setGeometry(QtCore.QRect(30, 360, 93, 28))
-        self.pushButton_update.setObjectName("pushButton_update")
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -30,5 +27,4 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Post Processor"))
-        self.pushButton_update.setText(_translate("MainWindow", "Update"))
 

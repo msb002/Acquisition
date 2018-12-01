@@ -29,6 +29,9 @@ import win32com.client  # Python ActiveX Client
 import threading
 import glob
 
+
+from PyQt5 import QtCore, QtWidgets
+
 def set_settings(experiment,settings):
     experiment.SetValue(CameraSettings.ReadoutControlAccumulations, settings['Accumulations'])
 
