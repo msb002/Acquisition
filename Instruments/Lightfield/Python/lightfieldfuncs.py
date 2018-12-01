@@ -27,6 +27,7 @@ from PrincetonInstruments.LightField.AddIns import ExperimentSettings
 from PrincetonInstruments.LightField.Automation import Automation
 import win32com.client  # Python ActiveX Client
 import threading
+import glob
 
 def set_settings(experiment,settings):
     experiment.SetValue(CameraSettings.ReadoutControlAccumulations, settings['Accumulations'])
@@ -169,6 +170,11 @@ class LoggingThread(threading.Thread):
             self.experiment.Acquire()
             while(self.experiment.IsRunning):
                 time.sleep(0.1)
-        
+
+
+    
 
 # exp1 = LFexp('TestCamera')
+
+# fp = 'C:\\Labview Test Data\\2018-11-30\\Logfiles\\TestCamera2\\'
+# open_saved_image(fp)
