@@ -100,8 +100,9 @@ class Ui_MainWindow(layout.Ui_MainWindow):
             self.exp2 = lf.LFexp(exp2name)
             exparr.append(self.exp2)
 
-        fpthread = lf.FilePathThread(exparr,logfilearr)
-        fpthread.start()
+        lfthread = lf.LFMonitorThread(exparr,logfilearr)
+        lfthread.start()
+
 
     def settingname_updated(self):
         settingname = self.comboBox_settingname.currentText()

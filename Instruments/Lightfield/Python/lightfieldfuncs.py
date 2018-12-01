@@ -127,12 +127,15 @@ class LFexp():
         set_settings(self.exp, setting)
 
 
-class FilePathThread(threading.Thread):
+class LFMonitorThread(threading.Thread):
     def __init__(self,explist, logfilearr):
         threading.Thread.__init__(self)
         self.explist= explist 
         self.runthread = True
         self.logfilearr = logfilearr
+        self.runningdict = {}
+        for exp in explist:
+            self.runningdict[exp] = exp.exp.IsRunning
 
     def run(self):
         self.LabVIEW = win32com.client.Dispatch("Labview.Application") # when start is called a new thread is created and the COM object must be created in that thread
@@ -144,7 +147,12 @@ class FilePathThread(threading.Thread):
             filename = os.path.split(filepath)[1]
             exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
             exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
+
+        datafolder = mhdpy.daq.get_rawdatafolder(self.LabVIEW)
+        self.eventlogwriter = mhdpy.eventlog.Eventlog(os.path.join(datafolder,"Eventlog.json"))
+
         while(self.runthread):
+            #Check for file info changes and send to experiments
             self.fileinfonew = mhdpy.daq.get_fileinfo(self.LabVIEW )
             if(self.fileinfonew != self.fileinfo):
                 self.fileinfo = self.fileinfonew
@@ -156,6 +164,13 @@ class FilePathThread(threading.Thread):
                         filename = os.path.split(filepath)[1]
                         exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
                         exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
+
+            #check if the experiments have changed their running state and write to the eventlog
+            for exp in self.explist:
+                if(exp.exp.IsRunning != self.runningdict[exp]):
+                    self.runningdict[exp] = exp.exp.IsRunning
+                    self.eventlogwriter.SavingVIsChange("LFpython_" + exp.exp.Name,exp.exp.IsRunning)
+
             time.sleep(0.1)
     
     def exit(self):
