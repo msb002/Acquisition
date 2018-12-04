@@ -32,7 +32,7 @@ progname = os.path.basename(sys.argv[0]) #What is this?
 progfolder = os.path.dirname(sys.argv[0])
 progversion = "0.1"
 
-experimentsfolder = 'C:\\Users\\aspit\\Documents\\LightField\\Experiments'
+experimentsfolder = 'C:\\Users\\aspitarl\\Documents\\LightField\\Experiments'
 import os
 
 import layout
