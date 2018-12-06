@@ -130,7 +130,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         num = int(self.lineEdit_numframes.text())
         width = int(self.lineEdit_gatewidth.text())
 
-        end = start + num*width
+        end = start + (num-1)*width
 
         self.lineEdit_gateend.setText(str(end))
 
