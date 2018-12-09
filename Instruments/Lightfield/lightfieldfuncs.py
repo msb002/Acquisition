@@ -27,6 +27,10 @@ from PrincetonInstruments.LightField.AddIns import ExperimentSettings
 from PrincetonInstruments.LightField.Automation import Automation
 import win32com.client  # Python ActiveX Client
 import threading
+import glob
+
+
+from PyQt5 import QtCore, QtWidgets
 
 def set_settings(experiment,settings):
     experiment.SetValue(CameraSettings.ReadoutControlAccumulations, settings['Accumulations'])
@@ -57,18 +61,7 @@ def get_settings(experiment):
     # settings['CenterWavelength'] = experiment.GetValue(SpectrometerSettings.GratingCenterWavelength)    
     # settings['Grating'] = experiment.GetValue(SpectrometerSettings.Grating)    
     return settings 
-
-def read_settings(filepath):
-    with open(filepath) as fp:
-        settingsdict = json.load(fp)
-    return settingsdict
-
-def write_setting(filepath,setting, name):
-    settings = read_settings(filepath)
-    settings[name] = setting
-    with open(filepath , 'w') as fp:
-        json.dump(settings, fp)
-    
+   
 
 def set_repetitive_gate(experiment, width, delay):
     # Check Gating Mode existence
@@ -118,7 +111,7 @@ def set_sequential_gating(experiment, starting_width, starting_delay, ending_wid
         print("System not capable of Gating Mode")
         
 
-def set_sequential_gating_num(experiment, width, starting_delay,numframes):
+def set_simpoequential_gating_num(experiment, width, starting_delay,numframes):
     experiment.SetValue(ExperimentSettings.AcquisitionFramesToStore,numframes)
     ending_delay = starting_delay + width*numframes
     set_sequential_gating(experiment, width, starting_delay, width, ending_delay)
@@ -129,39 +122,77 @@ class LFexp():
         self.exp = self.auto.LightFieldApplication.Experiment
         self.exp.Load(expname)
         self.name = expname
-        curfolder = os.path.dirname(os.path.realpath(__file__))
-        filepath = os.path.join(curfolder,"settings.json")
-        with open(filepath) as fp:
-            self.settingsdict = json.load(fp)
 
-    def setting(self,key):
-        set_settings(self.exp, self.settingsdict[key])
+    def set_setting(self,setting):
+        set_settings(self.exp, setting)
 
 
-
-
-class FilePathThread(threading.Thread):
-    def __init__(self,explist, logfile = False):
+class LFMonitorThread(threading.Thread):
+    def __init__(self,explist, logfilearr):
         threading.Thread.__init__(self)
         self.explist= explist 
         self.runthread = True
+        self.logfilearr = logfilearr
+        self.runningdict = {}
+        for exp in explist:
+            self.runningdict[exp] = exp.exp.IsRunning
 
     def run(self):
         self.LabVIEW = win32com.client.Dispatch("Labview.Application") # when start is called a new thread is created and the COM object must be created in that thread
         self.fileinfo = ""
+        for i, exp in enumerate(self.explist):
+            logfile = self.logfilearr[i]
+            filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
+            folder = os.path.split(filepath)[0]
+            filename = os.path.split(filepath)[1]
+            exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
+            exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
+
+        datafolder = mhdpy.daq.get_rawdatafolder(self.LabVIEW)
+        self.eventlogwriter = mhdpy.eventlog.Eventlog(os.path.join(datafolder,"Eventlog.json"))
+
         while(self.runthread):
+            #Check for file info changes and send to experiments
             self.fileinfonew = mhdpy.daq.get_fileinfo(self.LabVIEW )
             if(self.fileinfonew != self.fileinfo):
                 self.fileinfo = self.fileinfonew
-                for exp in self.explist:
-                    filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'')
-                    folder = os.path.split(filepath)[0]
-                    filename = os.path.split(filepath)[1]
-                    exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
-                    exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
+                for i, exp in enumerate(self.explist):
+                    logfile = self.logfilearr[i]
+                    if not logfile:
+                        filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
+                        folder = os.path.split(filepath)[0]
+                        filename = os.path.split(filepath)[1]
+                        exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
+                        exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
+
+            #check if the experiments have changed their running state and write to the eventlog
+            for exp in self.explist:
+                if(exp.exp.IsRunning != self.runningdict[exp]):
+                    self.runningdict[exp] = exp.exp.IsRunning
+                    self.eventlogwriter.SavingVIsChange("LFpython_" + exp.exp.Name,exp.exp.IsRunning)
+
             time.sleep(0.1)
     
     def exit(self):
         self.runthread = False
 
+class LoggingThread(threading.Thread):
+    def __init__(self,experiment):
+        threading.Thread.__init__(self)
+        self.experiment = experiment
+        self.logging = False
 
+    def run(self):
+        self.logging = True
+        while(self.logging):
+            self.experiment.Acquire()
+            while(self.experiment.IsRunning):
+                time.sleep(0.1)
+
+
+    
+
+# exp1 = LFexp('TestCamera')
+
+# fp = 'C:\\Labview Test Data\\2018-11-30\\Logfiles\\TestCamera2\\'
+# open_saved_image(fp)
