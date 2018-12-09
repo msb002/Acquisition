@@ -31,7 +31,9 @@ REQUIRED = [
 'pytz',
 'pyqt5',
 'pyqt5-tools',
-'tzlocal'
+'tzlocal',
+'pythonnet',
+'easygui'
 ]
 
 # What packages are optional?
