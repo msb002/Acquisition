@@ -110,11 +110,11 @@ def set_sequential_gating(experiment, starting_width, starting_delay, ending_wid
     else:
         print("System not capable of Gating Mode")
         
-
-def set_simpoequential_gating_num(experiment, width, starting_delay,numframes):
-    experiment.SetValue(ExperimentSettings.AcquisitionFramesToStore,numframes)
-    ending_delay = starting_delay + width*numframes
-    set_sequential_gating(experiment, width, starting_delay, width, ending_delay)
+#???? 
+# def set_simpoequential_gating_num(experiment, width, starting_delay,numframes):
+#     experiment.SetValue(ExperimentSettings.AcquisitionFramesToStore,numframes)
+#     ending_delay = starting_delay + width*numframes
+#     set_sequential_gating(experiment, width, starting_delay, width, ending_delay)
 
 class LFexp():
     def __init__(self, expname):
@@ -149,7 +149,7 @@ class LFMonitorThread(threading.Thread):
             exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
 
         datafolder = mhdpy.daq.get_rawdatafolder(self.LabVIEW)
-        self.eventlogwriter = mhdpy.eventlog.Eventlog(os.path.join(datafolder,"Eventlog.json"))
+        self.eventlogwriter = mhdpy.eventlog.Eventlog(os.path.join(datafolder,"Eventlog_Lightfield.json"))
 
         while(self.runthread):
             #Check for file info changes and send to experiments

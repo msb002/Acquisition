@@ -32,7 +32,7 @@ progname = os.path.basename(sys.argv[0]) #What is this?
 progfolder = os.path.dirname(sys.argv[0])
 progversion = "0.1"
 
-experimentsfolder = 'C:\\Users\\aspit\\Documents\\LightField\\Experiments'
+experimentsfolder = 'C:\\Users\\aspitarl\\Documents\\LightField\\Experiments'
 import os
 
 import layout
@@ -130,7 +130,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         num = int(self.lineEdit_numframes.text())
         width = int(self.lineEdit_gatewidth.text())
 
-        end = start + num*width
+        end = start + (num-1)*width
 
         self.lineEdit_gateend.setText(str(end))
 
