@@ -149,7 +149,10 @@ class LFMonitorThread(threading.Thread):
             exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
 
         datafolder = mhdpy.daq.get_rawdatafolder(self.LabVIEW)
-        self.eventlogwriter = mhdpy.eventlog.Eventlog(os.path.join(datafolder,"Eventlog_Lightfield.json"))
+        el_path = os.path.join(datafolder,"Eventlog_Lightfield.json")
+        with open(el_path, 'a+') as fp:
+            fp.write("")
+        self.eventlogwriter = mhdpy.eventlog.Eventlog(el_path)
 
         while(self.runthread):
             #Check for file info changes and send to experiments

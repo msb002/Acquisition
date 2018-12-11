@@ -122,7 +122,7 @@ class Ui_MainWindow(LaserVis_layout.Ui_MainWindow):
 class FolderMonitor(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
-        self.directory = "C:\\Labview Test Data\\2018-11-30\\Logfiles\\TestCamera2\\"
+        self.directory = "E:\\Data\\Raw Data\\2018-12-07\\Logfiles\\BeamTiming\\"
         self.files = glob.glob(self.directory +'/*.spe')
         self.runthread = True
     def run(self):
