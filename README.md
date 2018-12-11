@@ -1,13 +1,20 @@
+# Installation
+1. Make sure you have already installed the [mhdpy python package](https://github.com/MHDLab/mhdpy)
+2. Download the Git repository by typing `git clone https://github.com/MHDLab/Acquisition` in Git bash.
+3. Next, open the 'Common SubVis' folder in windows and double click to run `Setup_GlobalVariable.vi`. This will update the repository path that labview uses, which is contained within `GlobalVariables.vi`. 
+
 # Usage 
 
 ### Setup your experiment. 
 See the develop section below for an explanation of Lab configuration files.
 
-Once the sensors and instruments needed for your experiment are in place:
+If you have changed the phsical configuration of sensors into the DAQ you must update the lab configuraiton files, otherwise this section can be skipped. Labview uses these files to build a DAQmx task, naming your channels and including other metadata.
 1. Go to the folder `X:\Lab Configuration\` (if unavailable, refer to MHD Common Drive Info)
-2. Update the Instruments file to reflect your configuration (if necessary)
-3. Open the 'signal'_PXI_1 file corresponding to the signal types used in your experiment. Update these sensors to reflect those you edited for your experiment. (if necessary)
-4. Save changes and run git commiting script
+2. The Lab configuration folder is a Local (i.e. not on GitHub) Git respository and changes to the configuration file should be commited. If you haven't already read See [Contribting] for info on commiting changes.
+3. Before altering any of the files open Git bash in the folder (Right click and select open Git bash here) and run 'git status' to confirm that there are no uncommited changes. If so you should commit those changes. 
+4. Update the Instruments file to reflect your configuration (if necessary)
+5. Open the 'signal'_PXI_1 file corresponding to the signal types used in your experiment. Update these sensors to reflect those you edited for your experiment. (if necessary)
+6. When done editing the configuration files commit any changes.
 
 
 ### Startup Labview programs
@@ -17,7 +24,7 @@ Once the sensors and instruments needed for your experiment are in place:
   1. In labview Go to Tools->Python Integration Toolkit
   2. Set the path for the python installation to the python of your anaconda installation. Typically `C:\ProgramData\Anaconda3\python.exe`. You can find the path of your anaconda path by typing 'anaconda prompt' into windows, right clicking, and selecting open file location. 
 
-This VI creates and continuously writes to the 'event log' (eventlog.json) which is critical for the post processing of data after aquisition. The event log contains information about the experiment (see Development) suchas when Vis are stopped and started, etc. Importantly, the Monitor Vi is used to write 'Test Case Information' to the eventlog. In short, instead of telling individual VIs to save files in specific locations, you just put the current test case's information into the monitor VI and the rest will be taken care of afterwards. See the [post processing](https://github.com/aspitarl/MHDlab/wiki/Post-Processing) page for more information. 
+This VI creates and continuously writes to the 'event log' (eventlog.json) which is critical for the post processing of data after aquisition. The event log contains information about the experiment (see Development) suchas when Vis are stopped and started, etc. Importantly, the Monitor Vi is used to write 'Test Case Information' to the eventlog. In short, instead of telling individual VIs to save files in specific locations, you just put the current test case's information into the monitor VI and the rest will be taken care of afterwards. See the [post processing](https://github.com/MHDLab/PostProcessor) page for more information. 
 
 2. Set the test case information (found in `monitor.Vi`, which must be running) for your experiment. To create a new project ID, add it to `ProjectIndex.csv`. Files will saved or eventually post processed into the path `Z\Data\Raw Data\Todays Date\Project ID\SubFolder\Measurement Description`. Log files are saved under the path `Z\Data\Raw Data\Todays Date\Logfiles\Instrument name`
 
@@ -38,7 +45,7 @@ For `Chassis_Sensors.vi`, press stop in `Chassis_Sensors.vi`, not the individual
 
 Raw Data is saved in `Z:Data\Raw Data`. Raw data then undergoes  before being moved onto your personal computer for analysis.  
 
-[Click here to read the instructions for post processing](https://github.com/aspitarl/MHDlab/wiki/Post-Processing)
+[Click here to read the instructions for post processing](https://github.com/MHDLab/PostProcessor)
 
 # Development
 
