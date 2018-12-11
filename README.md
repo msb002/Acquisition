@@ -8,13 +8,14 @@
 ### Setup your experiment. 
 See the develop section below for an explanation of Lab configuration files.
 
-If you have changed the phsical configuration of sensors into the DAQ you must update the lab configuraiton files, otherwise this section can be skipped. Labview uses these files to build a DAQmx task, naming your channels and including other metadata.
+If you have changed the phsical configuration of sensors into the DAQ, or are starting a new project, you must update the lab configuraiton files. Otherwise this section can be skipped. Labview uses these files to build a DAQmx task, naming your channels and including other metadata.
 1. Go to the folder `X:\Lab Configuration\` (if unavailable, refer to MHD Common Drive Info)
 2. The Lab configuration folder is a Local (i.e. not on GitHub) Git respository and changes to the configuration file should be commited. If you haven't already read See [Contribting] for info on commiting changes.
 3. Before altering any of the files open Git bash in the folder (Right click and select open Git bash here) and run 'git status' to confirm that there are no uncommited changes. If so you should commit those changes. 
 4. Update the Instruments file to reflect your configuration (if necessary)
 5. Open the 'signal'_PXI_1 file corresponding to the signal types used in your experiment. Update these sensors to reflect those you edited for your experiment. (if necessary)
-6. When done editing the configuration files commit any changes.
+6. To create a new project ID, add it to `ProjectIndex.csv`.
+7. When done editing the configuration files commit any changes.
 
 
 ### Startup Labview programs
@@ -26,7 +27,7 @@ If you have changed the phsical configuration of sensors into the DAQ you must u
 
 This VI creates and continuously writes to the 'event log' (eventlog.json) which is critical for the post processing of data after aquisition. The event log contains information about the experiment (see Development) suchas when Vis are stopped and started, etc. Importantly, the Monitor Vi is used to write 'Test Case Information' to the eventlog. In short, instead of telling individual VIs to save files in specific locations, you just put the current test case's information into the monitor VI and the rest will be taken care of afterwards. See the [post processing](https://github.com/MHDLab/PostProcessor) page for more information. 
 
-2. Set the test case information (found in `monitor.Vi`, which must be running) for your experiment. To create a new project ID, add it to `ProjectIndex.csv`. Files will saved or eventually post processed into the path `Z\Data\Raw Data\Todays Date\Project ID\SubFolder\Measurement Description`. Log files are saved under the path `Z\Data\Raw Data\Todays Date\Logfiles\Instrument name`
+2. Set the test case information (found in `monitor.Vi`, which must be running) for your experiment. Files will saved or eventually post processed into the path `Z\Data\Raw Data\Todays Date\Project ID\SubFolder\Measurement Description`. Log files are saved under the path `Z\Data\Raw Data\Todays Date\Logfiles\Instrument name`
 
 3. If using anything that connects to the PXI chassis, Start `Senors\Chassis_Sensors.vi`. Set the sampling rate, and select the PXI cards and tasks to be used (or an Alicat sensor). Open NI MAX to see information about DAQmx tasks. Run Chassis_Sensors.vi, Data will begin logging. These VIs will now be run in the background for the rest of the experiment and should not be interacted with. 
 4. Start any instrument Vis you will be using. Located in `Instruments\`
@@ -34,7 +35,7 @@ This VI creates and continuously writes to the 'event log' (eventlog.json) which
 
 ### Data Acquisition
 
-Throughout the experiment, change the test case information in the `monitor.Vi` to write test case information changes to the event log. This will also change the file path in VIs that use direct logging.
+Throughout the experiment, change the test case information in the `monitor.Vi` to write test case information changes to the event log. This will also change the file path in VIs that use direct logging. 
 
 ### Shutdown
 
@@ -43,7 +44,7 @@ Once the experiment is finished, close all VIs, ending with `Monitor.vi` last.
 For `Chassis_Sensors.vi`, press stop in `Chassis_Sensors.vi`, not the individual sensor VIs that pop up. 
 * `Chassis_Sensors.vi` can take some time to shut down, as any DAQmx-based VIs need to do a file conversion from the raw DAQmx tdms file to a npdtms-readable tdms file. 
 
-Raw Data is saved in `Z:Data\Raw Data`. Raw data then undergoes  before being moved onto your personal computer for analysis.  
+Raw Data is saved in `Z:Data\Raw Data`. Raw data then undergoes post processing before being moved onto your personal computer for analysis.  
 
 [Click here to read the instructions for post processing](https://github.com/MHDLab/PostProcessor)
 
