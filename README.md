@@ -1,16 +1,21 @@
 # Installation
-1. Make sure you have already installed the [mhdpy python package](https://github.com/MHDLab/mhdpy)
-2. Download the Git repository by typing `git clone https://github.com/MHDLab/Acquisition` in Git bash.
-3. Next, open the 'Common SubVis' folder in windows and double click to run `Setup_GlobalVariable.vi`. This will update the repository path that labview uses, which is contained within `GlobalVariables.vi`. 
+1. Download the Git repository
+        * In your MHDLab folder right click and select 'Git Bash Here'
+        * type `git clone https://github.com/MHDLab/Acquisition`
+        * close git bash
+2. Open the Acquisition folder
+2. Open the 'Common SubVis' folder in windows and double click to run `Setup_GlobalVariable.vi`. This will update the repository path that labview uses, which is contained within `GlobalVariables.vi`. 
+3. Run `Monitor.vi` in the main Acquisition folder to confirm that everything is setup correctly. 
+        * If you get an error saying that the python installation is not a valid excectable, the python integration toolkit is not using the correct python. In Labview, go to Tools -> Python Integration Toolkit -> Select Default python. Select the Python in the py36 anaconda environment, located at `C:\ProgramData\Anaconda3\envs\py36\python.exe`. See [LabSetup](https://github.com/MHDLab/Documentation/blob/master/labsetup.md) for more information. 
 
-# Usage 
+# Usage
 
 ### Setup the lab configuration files
 
 If you have changed the phsical configuration of sensors into the DAQ, or are starting a new project, you must update the lab configuraiton files. Otherwise this section can be skipped. Labview uses these files to build a DAQmx task, naming your channels and including other metadata. See the development section below for an explanation of Lab configuration files.
-1. Go to the folder `X:\Lab Configuration\` (if unavailable, refer to MHD Common Drive Info)
-2. The Lab configuration folder is a Local (i.e. not on GitHub) Git respository and changes to the configuration file should be commited. If you haven't already read See [Contribting](https://github.com/MHDLab/Documentation/blob/master/CONTRIBUTING.md) for info on commiting changes.
-3. Before altering any of the files open Git bash in the folder (Right click and select open Git bash here) and run 'git status' to confirm that there are no uncommited changes. If so you should commit those changes. 
+1. Go to the folder `X:\Lab Configuration\` (if the X drive is unavailable, refer to MHD Common Drive Info)
+2. The Lab configuration folder is a Local (i.e. not on GitHub) Git respository and changes to the configuration file should be commited. If you haven't already read See [Contributing](https://github.com/MHDLab/Documentation/blob/master/CONTRIBUTING.md) for correct practices on commiting changes.
+3. Before altering any of the files open Git bash in the folder (Right click and select open Git bash here) and run 'git status' to confirm that there are no uncommited changes. If so you should commit those changes and leave a message indicating that there were uncommited changes. 
 4. Update the Instruments file to reflect your configuration (if necessary)
 5. Open the 'signal'_PXI_1 file corresponding to the signal types used in your experiment. Update these sensors to reflect those you edited for your experiment by filling in the information according to each column in the 'User Inputs' section.
 6. To create a new project ID, add it to `ProjectIndex.csv`.
@@ -21,9 +26,9 @@ If you have changed the phsical configuration of sensors into the DAQ, or are st
 1. Open and run `monitor.Vi`. 
 
 2. Set the test case information (found in `monitor.Vi`) for your experiment.
-* `monitor.Vi` creates and continuously writes to the 'event log' which contains the critical information needed for the post processing of data after aquisition. Most importantly instead of telling individual VIs to save files in specific locations, you just put the current test case's information into the monitor VI and the rest will be taken care of during the experiment or post processing. See the [post processing](https://github.com/MHDLab/PostProcessor) page for more information. 
-* Files will saved or eventually post processed into the path `Z\Data\Raw Data\Todays Date\Project ID\SubFolder\Measurement Description`. Log files are saved under the path `Z\Data\Raw Data\Todays Date\Logfiles\Instrument name`. The eventlog is stored in `Z\Data\Raw Data\Todays Date\eventlog.json`.
+    * `monitor.Vi` creates and continuously writes to the 'event log' which contains the critical information needed for the post processing of data after aquisition. Most importantly instead of telling individual VIs to save files in specific locations, you just put the current test case's information into the monitor VI and the rest will be taken care of during the experiment or post processing. See the [post processing](https://github.com/MHDLab/PostProcessor) page for more information. 
 
+        
 3. If using anything that connects to the PXI chassis, Start `Senors\Chassis_Sensors.vi`. Set the sampling rate, and select the PXI devices or Alicat sensors that will be used. Open NI MAX to see information about PXI devices, which are the physical cards in the DAQ Chassis. Run `Chassis_Sensors.vi`, Data will begin logging. These VIs will now be run in the background for the rest of the experiment and can be minimized. 
 4. Start any instrument Vis you will be using. Located in `Instruments\`
 5. To visualize combinations of data, start a visualization vi in `Visualization\`. Note that Visualization VIs are not critical to the data acquisition. These VIs can be started and stopped independently of logging data without any affect. 
@@ -39,15 +44,16 @@ Once the experiment is finished, close all VIs, ending with `Monitor.vi` last.
 For `Chassis_Sensors.vi`, press stop in `Chassis_Sensors.vi`, not the individual sensor VIs that pop up. 
 * `Chassis_Sensors.vi` can take some time to shut down, as any DAQmx-based VIs need to do a file conversion from the raw DAQmx tdms file to a npdtms-readable tdms file. 
 
-Raw Data is saved in `Z:Data\Raw Data`. Raw data then undergoes post processing before being moved onto your personal computer for analysis.  
 
-[Click here to read the instructions for post processing](https://github.com/MHDLab/PostProcessor)
+Raw data then undergoes post processing. Raw data Files are saved into a directory dependent on the 'Raw Data Folder' variable located within `GlobalVariables.vi`, at the time of this writing `E:\Data\RawData`. 
 
-## Errors
+Within the Raw Data Folder:
+    * The eventlog is stored in `Todays Date\eventlog.json`.
+    * Logfiles under the path `Todays Date\Logfiles\Instrument name`.
+    * pre-processed and post-processed files will be saved `Todays Date\Project ID\SubFolder\Measurement Description`.
 
-* When starting Monitor.vi, If you get an error from the python integration toolkit about a python installation:
-  1. In labview Go to Tools->Python Integration Toolkit
-  2. Set the path for the python installation to the python of your anaconda installation. Typically `C:\ProgramData\Anaconda3\python.exe`. You can find the path of your anaconda path by typing 'anaconda prompt' into windows, right clicking, and selecting open file location. 
+
+[Click here to move onto post processing](https://github.com/MHDLab/PostProcessor)
 
 # Development
 
