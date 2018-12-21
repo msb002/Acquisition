@@ -43,22 +43,14 @@ class Ui_MainWindow(layout.Ui_MainWindow):
     def __init__(self):
 
         self.settingspath = os.path.join(progfolder, "settings.json")
-        
-        with open(self.settingspath,'r') as fileread:
-            try:
-                self.settings = json.load(fileread)
-            except json.decoder.JSONDecodeError:
-                print('Could not read settings')
-                self.settings = {}
+        self.settings = {}
         
 
     def setup(self):
         """links internal function to the various widgets in the main window"""
         self.pushButton_start.clicked.connect(self.start)
 
-        self.comboBox_settingname.insertItems(0,self.settings.keys())
-        self.settingname_updated()
-        self.comboBox_settingname.currentIndexChanged.connect(self.settingname_updated)
+        self.load_settings()
 
         onlyfiles = [f for f in os.listdir(experimentsfolder) if os.path.isfile(os.path.join(experimentsfolder, f))]
         experimentlist = [os.path.splitext(f)[0] for f in onlyfiles]
@@ -82,9 +74,14 @@ class Ui_MainWindow(layout.Ui_MainWindow):
 
         self.pushButton_calcgate.clicked.connect(self.calc_gateparams)
         self.pushButton_updategate.clicked.connect(self.update_gateparams)
-        self.pushButton_save.clicked.connect(self.save)
+        self.pushButton_save.clicked.connect(self.save_settings)
+        self.pushButton_load.clicked.connect(self.load_settings)
+        self.pushButton_newsetting.clicked.connect(self.newsetting)
 
         self.radioButton_contacq.released.connect(self.continuousacq)
+
+        self.comboBox_settingname.currentIndexChanged.connect(self.settingname_updated)
+        
 
     def start(self):
         exp1name = self.comboBox_exp1.currentText()
@@ -164,9 +161,34 @@ class Ui_MainWindow(layout.Ui_MainWindow):
             self.settings[settingname] = setting
             self.settingname_updated()
 
-    def save(self):
+    def newsetting(self):
+        cursettingname = self.comboBox_settingname.currentText()
+        newsettingname = self.lineEdit_settingname.text()
+        self.settings[newsettingname] = self.settings[cursettingname]
+        num = self.comboBox_settingname.count()
+        self.comboBox_settingname.insertItem(num,newsettingname)
+        self.comboBox_settingname.setCurrentIndex(num)
+
+    def save_settings(self):
         with open(self.settingspath , 'w') as fp:
             json.dump(self.settings, fp)
+        self.load_settings()
+
+    def load_settings(self):
+        with open(self.settingspath,'r') as fileread:
+            try:
+                self.settings = json.load(fileread)
+
+                self.comboBox_settingname.blockSignals(True)
+                self.comboBox_settingname.clear()
+                self.comboBox_settingname.insertItems(0,self.settings.keys())
+                self.settingname_updated()
+                self.comboBox_settingname.blockSignals(False)
+                
+            except json.decoder.JSONDecodeError:
+                print('Could not read settings')
+                self.settings = {}
+        
 
     def continuousacq(self):
         if(self.radioButton_contacq.isChecked()):
