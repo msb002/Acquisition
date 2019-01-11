@@ -6,6 +6,8 @@ import mhdpy
 import time
 import json
 
+repopath = os.path.split(os.path.split(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0])[0])[0]
+
 from System.IO import * # Import System.IO for saving and opening files
 from System import String # Import C compatible List and String
 from System.Collections.Generic import List
@@ -142,13 +144,13 @@ class LFMonitorThread(threading.Thread):
         self.fileinfo = ""
         for i, exp in enumerate(self.explist):
             logfile = self.logfilearr[i]
-            filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
+            filepath = mhdpy.daq.gen_filepath(repopath, self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
             folder = os.path.split(filepath)[0]
             filename = os.path.split(filepath)[1]
             exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
             exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
 
-        datafolder = mhdpy.daq.get_rawdatafolder(self.LabVIEW)
+        datafolder = mhdpy.daq.get_rawdatafolder(repopath,self.LabVIEW)
         el_path = os.path.join(datafolder,"Eventlog_Lightfield.json")
         with open(el_path, 'a+') as fp:
             fp.write("")
@@ -156,13 +158,13 @@ class LFMonitorThread(threading.Thread):
 
         while(self.runthread):
             #Check for file info changes and send to experiments
-            self.fileinfonew = mhdpy.daq.get_fileinfo(self.LabVIEW )
+            self.fileinfonew = mhdpy.daq.get_fileinfo(repopath, self.LabVIEW )
             if(self.fileinfonew != self.fileinfo):
                 self.fileinfo = self.fileinfonew
                 for i, exp in enumerate(self.explist):
                     logfile = self.logfilearr[i]
                     if not logfile:
-                        filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
+                        filepath = mhdpy.daq.gen_filepath(repopath,self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
                         folder = os.path.split(filepath)[0]
                         filename = os.path.split(filepath)[1]
                         exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
@@ -199,3 +201,6 @@ class LoggingThread(threading.Thread):
 
 # fp = 'C:\\Labview Test Data\\2018-11-30\\Logfiles\\TestCamera2\\'
 # open_saved_image(fp)
+# LabVIEW = win32com.client.Dispatch("Labview.Application")
+# print(repopath)
+# datafolder = mhdpy.daq.get_rawdatafolder(repopath,LabVIEW)
