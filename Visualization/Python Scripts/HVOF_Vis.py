@@ -28,7 +28,7 @@ def HVOF_Calc(arr):
     
     #Phi Calculation: mass flow is calculated in g/min
     m_dot_fuel = Fl_fuel * rho_kero * 1000 #1000g/1kg
-    phi = (m_dot_fuel/m_dot_O)/stoich
+    phi = (m_dot_O/m_dot_fuel)/stoich
     
     #Heat Calculations
     Q_w = (T_out-T_in)*C_w*Fl_w*rho_w * (1/60.0) #1min/60seconds
