@@ -3,8 +3,8 @@ import datetime
 import numpy as np
 import pandas as pd
 
-JPpath = 'Z:\\Data\\JP8000\\Reports'
-rawdatapath = 'Z:\\Data\\Raw Data'
+JPpath = 'H:\\Data\\JP8000'
+rawdatapath = 'H:\\Data\\Raw Data'
 
 from shutil import copyfile
 
