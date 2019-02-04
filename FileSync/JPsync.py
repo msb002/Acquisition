@@ -4,8 +4,11 @@ import datetime
 # import pandas as pd
 from shutil import copyfile
 
-JPpath = 'C:\\Users\\aspitarl\\Desktop\\JP Data\\Reports'
-rawdatapath = 'C:\\Users\\aspitarl\\OneDrive\\MHD Common Drive\\Data\\Raw Data'
+
+
+
+JPpath = 'H:\\Data\\JP8000'
+rawdatapath = 'H:\\Data\\Raw Data'
 
 fns = [fn for fn in os.listdir(JPpath) if os.path.isfile(os.path.join(JPpath,fn))]
 
