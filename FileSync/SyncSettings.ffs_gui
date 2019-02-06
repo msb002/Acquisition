@@ -28,6 +28,18 @@
     </Filter>
     <FolderPairs>
         <Pair>
+            <Left>H:\Data\Video</Left>
+            <Right>Z:\Data\Video</Right>
+        </Pair>
+        <Pair>
+            <Left>H:\Data\Calibration</Left>
+            <Right>Z:\Data\Calibration</Right>
+        </Pair>
+        <Pair>
+            <Left>H:\Data\JP8000</Left>
+            <Right>Z:\Data\JP8000</Right>
+        </Pair>
+        <Pair>
             <Left>H:\Data\Raw Data</Left>
             <Right>Z:\Data\Raw Data</Right>
         </Pair>

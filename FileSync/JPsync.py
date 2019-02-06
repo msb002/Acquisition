@@ -1,12 +1,14 @@
 import os
 import datetime
-import numpy as np
-import pandas as pd
+# import numpy as np
+# import pandas as pd
+from shutil import copyfile
+
+
+
 
 JPpath = 'H:\\Data\\JP8000'
 rawdatapath = 'H:\\Data\\Raw Data'
-
-from shutil import copyfile
 
 fns = [fn for fn in os.listdir(JPpath) if os.path.isfile(os.path.join(JPpath,fn))]
 
@@ -25,3 +27,23 @@ for fn in fns:
         print('copying ' + outpath)
         copyfile(fp,outpath)
 
+input("Press enter to continue...")
+
+"""
+To build into an excecutable use pyinstaler.
+
+If encountering a recursion error follow instructions here:
+https://stackoverflow.com/questions/38977929/pyinstaller-creating-exe-runtimeerror-maximum-recursion-depth-exceeded-while-ca
+
+to create the .spec file
+pyinstaller JPsync.py -c --onefile 
+
+Then close out and add the lines to spec file
+
+import sys
+sys.setrecursionlimit(5000)
+
+then run 
+
+pyinstaller JPsync.spec   
+"""
