@@ -33,7 +33,7 @@ progfolder = os.path.dirname(sys.argv[0])
 progversion = "0.1"
 
 experimentsfolder = 'C:\\Users\\aspitarl\\Documents\\LightField\\Experiments'
-import os
+import os 
 
 import layout
 class Ui_MainWindow(layout.Ui_MainWindow):
@@ -41,24 +41,16 @@ class Ui_MainWindow(layout.Ui_MainWindow):
 
     ###Initialization###
     def __init__(self):
-
         self.settingspath = os.path.join(progfolder, "settings.json")
-        self.settings = {}
-        
+        self.settings = {}     
 
     def setup(self):
         """links internal function to the various widgets in the main window"""
         self.pushButton_start.clicked.connect(self.start)
 
-        self.load_settings()
+        
 
-        onlyfiles = [f for f in os.listdir(experimentsfolder) if os.path.isfile(os.path.join(experimentsfolder, f))]
-        experimentlist = [os.path.splitext(f)[0] for f in onlyfiles]
-        experimentlist.append("")
-        self.comboBox_exp1.insertItems(0,experimentlist)
-        self.comboBox_exp2.insertItems(0,experimentlist)
-        if(len(experimentlist)>1):
-            self.comboBox_exp2.setCurrentIndex(1)
+ 
 
         regex = QtCore.QRegExp("[0-9_]+")
         validator = QtGui.QRegExpValidator(regex)
@@ -67,10 +59,8 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.lineEdit_numframes.setValidator(validator)
         self.lineEdit_gatewidth.setValidator(validator)
 
-        self.pushButton_pullexp1.clicked.connect(lambda : self.pull_settings('exp1'))
-        self.pushButton_pullexp2.clicked.connect(lambda : self.pull_settings('exp2'))
-        self.pushButton_sendexp1.clicked.connect(lambda : self.send_settings('exp1'))
-        self.pushButton_sendexp2.clicked.connect(lambda : self.send_settings('exp2'))
+        self.pushButton_pull.clicked.connect(self.pull_settings)
+        self.pushButton_send.clicked.connect(self.send_settings)
 
         self.pushButton_calcgate.clicked.connect(self.calc_gateparams)
         self.pushButton_updategate.clicked.connect(self.update_gateparams)
@@ -81,25 +71,35 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.radioButton_contacq.released.connect(self.continuousacq)
 
         self.comboBox_settingname.currentIndexChanged.connect(self.settingname_updated)
-        
 
-    def start(self):
-        exp1name = self.comboBox_exp1.currentText()
-        exp2name = self.comboBox_exp2.currentText()
-        exparr = []
-        logfilearr = []
-        if(exp1name != ""):
-            logfilearr.append(bool(self.checkBox_logfileexp1.checkState()))
-            self.exp1 = lf.LFexp(exp1name)
-            exparr.append(self.exp1)
-        if(exp2name != ""):
-            logfilearr.append(bool(self.checkBox_logfileexp2.checkState()))
-            self.exp2 = lf.LFexp(exp2name)
-            exparr.append(self.exp2)
+        #Populate experiment names
 
-        lfthread = lf.LFMonitorThread(exparr,logfilearr)
-        lfthread.start()
+        onlyfiles = [f for f in os.listdir(experimentsfolder) if os.path.isfile(os.path.join(experimentsfolder, f))]
+        experimentlist = [os.path.splitext(f)[0] for f in onlyfiles]
+        experimentlist.append("")
+        self.comboBox_exp1.insertItems(0,experimentlist)
+        self.comboBox_exp2.insertItems(0,experimentlist)
+        if(len(experimentlist)>1):
+            self.comboBox_exp2.setCurrentIndex(1)
 
+        #load in settings
+
+        self.load_settings()
+
+    def load_settings(self):
+        with open(self.settingspath,'r') as fileread:
+            try:
+                self.settings = json.load(fileread)
+
+                self.comboBox_settingname.blockSignals(True)
+                self.comboBox_settingname.clear()
+                self.comboBox_settingname.insertItems(0,self.settings.keys())
+                self.settingname_updated()
+                self.comboBox_settingname.blockSignals(False)
+                
+            except json.decoder.JSONDecodeError:
+                print('Could not read settings')
+                self.settings = {}        
 
     def settingname_updated(self):
         settingname = self.comboBox_settingname.currentText()
@@ -120,7 +120,22 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.lineEdit_numframes.setText(str(int(setting['NumFrames'])))
         self.calc_gateparams()
 
-
+    def start(self):
+        exp1name = self.comboBox_exp1.currentText()
+        exp2name = self.comboBox_exp2.currentText()
+        exparr = []
+        logfilearr = []
+        if(exp1name != ""):
+            logfilearr.append(bool(self.checkBox_logfileexp1.checkState()))
+            self.exp1 = lf.LFexp(exp1name)
+            exparr.append(self.exp1)
+        if(exp2name != ""):
+            logfilearr.append(bool(self.checkBox_logfileexp2.checkState()))
+            self.exp2 = lf.LFexp(exp2name)
+            exparr.append(self.exp2)
+        self.comboBox_expname.
+        lfthread = lf.LFMonitorThread(exparr,logfilearr)
+        lfthread.start()
 
     def calc_gateparams(self):
         start = int(self.lineEdit_gatestart.text())
@@ -141,16 +156,16 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.settingname_updated()
 
     def send_settings(self,expstr):
-        if hasattr(self,expstr):
-            if expstr == "exp1":
-                experiment = self.exp1.exp
-            elif expstr == "exp2":
-                experiment = self.exp2.exp
-            settingname = self.comboBox_settingname.currentText()
-            setting = self.settings[settingname]
-            lf.set_settings(experiment,setting)
+        # if hasattr(self,expstr):
+        #     if expstr == "exp1":
+        #         experiment = self.exp1.exp
+        #     elif expstr == "exp2":
+        #         experiment = self.exp2.exp
+        settingname = self.comboBox_settingname.currentText()
+        setting = self.settings[settingname]
+        lf.set_settings(experiment,setting)
 
-    def pull_settings(self,expstr):
+    def pull_settings(self):
         if hasattr(self,expstr):
             if expstr == "exp1":
                 experiment = self.exp1.exp
@@ -174,20 +189,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
             json.dump(self.settings, fp)
         self.load_settings()
 
-    def load_settings(self):
-        with open(self.settingspath,'r') as fileread:
-            try:
-                self.settings = json.load(fileread)
 
-                self.comboBox_settingname.blockSignals(True)
-                self.comboBox_settingname.clear()
-                self.comboBox_settingname.insertItems(0,self.settings.keys())
-                self.settingname_updated()
-                self.comboBox_settingname.blockSignals(False)
-                
-            except json.decoder.JSONDecodeError:
-                print('Could not read settings')
-                self.settings = {}
         
 
     def continuousacq(self):
