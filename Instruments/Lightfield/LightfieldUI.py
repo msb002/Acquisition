@@ -127,7 +127,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
 
         lfthread = lf.LFMonitorThread(exparr,logfilearr)
         lfthread.start()
-        self.comboBox_expname.insertItems(0,self.expdict.keys())
+        
 
         for experimentname in self.expdict.keys():
             experiment = self.expdict[experimentname]
@@ -136,8 +136,8 @@ class Ui_MainWindow(layout.Ui_MainWindow):
                 self.settings[experimentname] = {}
             self.settings[experimentname]['default'] = settings
             
-        
-        self.experimentname_updated()
+        self.comboBox_expname.insertItems(0,self.expdict.keys())
+        # self.experimentname_updated()
 
     def experimentname_updated(self):
         experimentname = self.comboBox_expname.currentText()
