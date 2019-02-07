@@ -144,13 +144,15 @@ class LFMonitorThread(threading.Thread):
         self.fileinfo = ""
         for i, exp in enumerate(self.explist):
             logfile = self.logfilearr[i]
-            filepath = mhdpy.daq.gen_filepath(repopath, self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
+            filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
             folder = os.path.split(filepath)[0]
             filename = os.path.split(filepath)[1]
             exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)
             exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
 
-        datafolder = mhdpy.daq.get_rawdatafolder(repopath,self.LabVIEW)
+        datafolder = mhdpy.daq.get_rawdatafolder(self.LabVIEW)
+        if not os.path.exists(datafolder):
+            os.makedirs(datafolder)
         el_path = os.path.join(datafolder,"Eventlog_Lightfield.json")
         with open(el_path, 'a+') as fp:
             fp.write("")
@@ -158,13 +160,13 @@ class LFMonitorThread(threading.Thread):
 
         while(self.runthread):
             #Check for file info changes and send to experiments
-            self.fileinfonew = mhdpy.daq.get_fileinfo(repopath, self.LabVIEW )
+            self.fileinfonew = mhdpy.daq.get_fileinfo(self.LabVIEW )
             if(self.fileinfonew != self.fileinfo):
                 self.fileinfo = self.fileinfonew
                 for i, exp in enumerate(self.explist):
                     logfile = self.logfilearr[i]
                     if not logfile:
-                        filepath = mhdpy.daq.gen_filepath(repopath,self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
+                        filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
                         folder = os.path.split(filepath)[0]
                         filename = os.path.split(filepath)[1]
                         exp.exp.SetValue(ExperimentSettings.FileNameGenerationDirectory,folder)

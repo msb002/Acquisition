@@ -141,7 +141,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Post Processor"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Lightfield Control"))
         self.label.setText(_translate("MainWindow", "Experiment 1"))
         self.label_2.setText(_translate("MainWindow", "Setting name"))
         self.label_3.setText(_translate("MainWindow", "Elements"))
