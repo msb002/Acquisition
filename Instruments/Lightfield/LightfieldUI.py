@@ -88,20 +88,12 @@ class Ui_MainWindow(layout.Ui_MainWindow):
             with open(self.settingspath,'r') as fileread:
                 try:
                     self.settings = json.load(fileread)
-
-                    # self.comboBox_expname.blockSignals(True)
-                    # self.comboBox_expname.clear()
-                    # self.comboBox_expname.insertItems(0,self.settings.keys())
-                    # self.experimentname_updated()
-                    # self.comboBox_expname.blockSignals(False)
-
                 except json.decoder.JSONDecodeError:
                     print('Could not read settings')
                     self.settings = {}       
         else:
             print('setting file doesnt exist') 
             self.settings = {}
-            # self.save_settings()
 
     def load_button(self):
         self.load_settings()
@@ -110,10 +102,13 @@ class Ui_MainWindow(layout.Ui_MainWindow):
     def start(self):
         exp1name = self.comboBox_exp1.currentText()
         exp2name = self.comboBox_exp2.currentText()
-        exparr = []
-        logfilearr = []
+        
+        logfilearr = [] #Whether LF instances are set to 'logging' mode
+
+        #TODO: get rid of this list by using dict.items()
+        exparr = [] 
         self.expdict = {}
-        if(exp1name != ""):
+        if(exp1name != ""): 
             logfilearr.append(bool(self.checkBox_logfileexp1.checkState()))
             self.exp1 = lf.LFexp(exp1name)
             exparr.append(self.exp1)
@@ -124,11 +119,10 @@ class Ui_MainWindow(layout.Ui_MainWindow):
             exparr.append(self.exp2)
             self.expdict[exp2name] = self.exp2
 
-
+        #Start monitor threads which monitor filename changes and write to the eventlog
         lfthread = lf.LFMonitorThread(exparr,logfilearr)
         lfthread.start()
         
-
         for experimentname in self.expdict.keys():
             experiment = self.expdict[experimentname]
             settings = lf.get_settings(experiment.exp)
@@ -140,10 +134,11 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         # self.experimentname_updated()
 
     def experimentname_updated(self):
+        #When changing experiment name, update the settings selector
         experimentname = self.comboBox_expname.currentText()
-
         self.expsettings = self.settings[experimentname]
-
+        
+        #Insert new settings into setting selector and update the list of settings
         self.comboBox_settingname.blockSignals(True)
         self.comboBox_settingname.clear()
         self.comboBox_settingname.insertItems(0,self.expsettings.keys())
@@ -164,6 +159,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.settings_elements.setText(settingliststr)
         self.lineEdit_settingname.setText(settingname)
 
+        #Update gate calculator
         self.lineEdit_gatestart.setText(str(int(setting['GatingSequentialStartingGate_Delay'])))
         #self.lineEdit_gateend.setText(setting['GatingSequentialEndingGate_Delay'])
         self.lineEdit_gatewidth.setText(str(int(setting['GatingSequentialStartingGate_Width'])))
@@ -171,6 +167,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.calc_gateparams()
 
     def send_settings(self,expstr):
+        #Send settings to experiment
         experimentname = self.comboBox_expname.currentText()
         experiment = self.expdict[experimentname]
         settingname = self.comboBox_settingname.currentText()
@@ -178,6 +175,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         lf.set_settings(experiment.exp,setting)
 
     def pull_settings(self):
+        #Get settings from experiment
         experimentname = self.comboBox_expname.currentText()
         experiment = self.expdict[experimentname]
         setting = lf.get_settings(experiment.exp)
@@ -196,6 +194,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.lineEdit_gateend.setText(str(end))
 
     def update_gateparams(self):
+        #Puts calculated gate params into internal setting, does not send to experiment. 
         experimentname = self.comboBox_expname.currentText()
         settingname = self.comboBox_settingname.currentText()
         self.settings[experimentname][settingname]['GatingSequentialStartingGate_Delay'] =  int(self.lineEdit_gatestart.text())
@@ -206,6 +205,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.settingname_updated()
 
     def newsetting(self):
+        #Copy the current setting to a new item in the dict
         cursettingname = self.comboBox_settingname.currentText()
         newsettingname = self.lineEdit_settingname.text()
         experimentname = self.comboBox_expname.currentText()
@@ -221,6 +221,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.experimentname_updated()
 
     def continuousacq(self):
+        #Start a logging thread which constantly restarts acquisition. 
         if(self.radioButton_contacq.isChecked()):
             self.lt = lf.LoggingThread(self.exp2.exp)
             self.lt.start()
