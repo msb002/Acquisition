@@ -167,6 +167,10 @@ class LFMonitorThread(threading.Thread):
                 for i, exp in enumerate(self.explist):
                     logfile = self.logfilearr[i]
                     if not logfile:
+                        if exp.exp.IsRunning:
+                            print('cannot change test case while experiment is running and not in logging mode...stopping experiment')
+                            """After some research I will have to switch this to a QtThread in order to send messages to the main window. So just stopping the experiment for now."""
+                            exp.exp.Stop()
                         filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
                         folder = os.path.split(filepath)[0]
                         filename = os.path.split(filepath)[1]
