@@ -33,7 +33,7 @@ progfolder = os.path.dirname(sys.argv[0])
 progversion = "0.1"
 
 experimentsfolder = 'C:\\Users\\aspitarl\\Documents\\LightField\\Experiments'
-import os
+import os 
 
 import layout
 class Ui_MainWindow(layout.Ui_MainWindow):
@@ -41,16 +41,35 @@ class Ui_MainWindow(layout.Ui_MainWindow):
 
     ###Initialization###
     def __init__(self):
-
         self.settingspath = os.path.join(progfolder, "settings.json")
-        self.settings = {}
-        
+        self.settings = {}     
 
     def setup(self):
         """links internal function to the various widgets in the main window"""
         self.pushButton_start.clicked.connect(self.start)
 
-        self.load_settings()
+        regex = QtCore.QRegExp("[0-9_]+")
+        validator = QtGui.QRegExpValidator(regex)
+        self.lineEdit_gateend.setValidator(validator)
+        self.lineEdit_gatestart.setValidator(validator)
+        self.lineEdit_numframes.setValidator(validator)
+        self.lineEdit_gatewidth.setValidator(validator)
+
+        self.pushButton_pull.clicked.connect(self.pull_settings)
+        self.pushButton_send.clicked.connect(self.send_settings)
+
+        self.pushButton_calcgate.clicked.connect(self.calc_gateparams)
+        self.pushButton_updategate.clicked.connect(self.update_gateparams)
+        self.pushButton_save.clicked.connect(self.save_settings)
+        self.pushButton_load.clicked.connect(self.load_button)
+        self.pushButton_newsetting.clicked.connect(self.newsetting)
+
+        self.radioButton_contacq.released.connect(self.continuousacq)
+
+        self.comboBox_settingname.currentIndexChanged.connect(self.settingname_updated)
+        self.comboBox_expname.currentIndexChanged.connect(self.experimentname_updated)
+
+        #Populate experiment names
 
         onlyfiles = [f for f in os.listdir(experimentsfolder) if os.path.isfile(os.path.join(experimentsfolder, f))]
         experimentlist = [os.path.splitext(f)[0] for f in onlyfiles]
@@ -60,51 +79,77 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         if(len(experimentlist)>1):
             self.comboBox_exp2.setCurrentIndex(1)
 
-        regex = QtCore.QRegExp("[0-9_]+")
-        validator = QtGui.QRegExpValidator(regex)
-        self.lineEdit_gateend.setValidator(validator)
-        self.lineEdit_gatestart.setValidator(validator)
-        self.lineEdit_numframes.setValidator(validator)
-        self.lineEdit_gatewidth.setValidator(validator)
+        #load in settings
 
-        self.pushButton_pullexp1.clicked.connect(lambda : self.pull_settings('exp1'))
-        self.pushButton_pullexp2.clicked.connect(lambda : self.pull_settings('exp2'))
-        self.pushButton_sendexp1.clicked.connect(lambda : self.send_settings('exp1'))
-        self.pushButton_sendexp2.clicked.connect(lambda : self.send_settings('exp2'))
+        self.load_settings()
 
-        self.pushButton_calcgate.clicked.connect(self.calc_gateparams)
-        self.pushButton_updategate.clicked.connect(self.update_gateparams)
-        self.pushButton_save.clicked.connect(self.save_settings)
-        self.pushButton_load.clicked.connect(self.load_settings)
-        self.pushButton_newsetting.clicked.connect(self.newsetting)
+    def load_settings(self):
+        if os.path.exists(self.settingspath):
+            with open(self.settingspath,'r') as fileread:
+                try:
+                    self.settings = json.load(fileread)
+                except json.decoder.JSONDecodeError:
+                    print('Could not read settings')
+                    self.settings = {}       
+        else:
+            print('setting file doesnt exist') 
+            self.settings = {}
 
-        self.radioButton_contacq.released.connect(self.continuousacq)
-
-        self.comboBox_settingname.currentIndexChanged.connect(self.settingname_updated)
-        
+    def load_button(self):
+        self.load_settings()
+        self.experimentname_updated()
 
     def start(self):
         exp1name = self.comboBox_exp1.currentText()
         exp2name = self.comboBox_exp2.currentText()
-        exparr = []
-        logfilearr = []
-        if(exp1name != ""):
+        
+        logfilearr = [] #Whether LF instances are set to 'logging' mode
+
+        #TODO: get rid of this list by using dict.items()
+        exparr = [] 
+        self.expdict = {}
+        if(exp1name != ""): 
             logfilearr.append(bool(self.checkBox_logfileexp1.checkState()))
             self.exp1 = lf.LFexp(exp1name)
             exparr.append(self.exp1)
+            self.expdict[exp1name] = self.exp1
         if(exp2name != ""):
             logfilearr.append(bool(self.checkBox_logfileexp2.checkState()))
             self.exp2 = lf.LFexp(exp2name)
             exparr.append(self.exp2)
+            self.expdict[exp2name] = self.exp2
 
+        #Start monitor threads which monitor filename changes and write to the eventlog
         lfthread = lf.LFMonitorThread(exparr,logfilearr)
         lfthread.start()
+        
+        for experimentname in self.expdict.keys():
+            experiment = self.expdict[experimentname]
+            settings = lf.get_settings(experiment.exp)
+            if not experimentname in self.settings:
+                self.settings[experimentname] = {}
+            self.settings[experimentname]['default'] = settings
+            
+        self.comboBox_expname.insertItems(0,self.expdict.keys())
+        # self.experimentname_updated()
+
+    def experimentname_updated(self):
+        #When changing experiment name, update the settings selector
+        experimentname = self.comboBox_expname.currentText()
+        self.expsettings = self.settings[experimentname]
+        
+        #Insert new settings into setting selector and update the list of settings
+        self.comboBox_settingname.blockSignals(True)
+        self.comboBox_settingname.clear()
+        self.comboBox_settingname.insertItems(0,self.expsettings.keys())
+        self.settingname_updated()
+        self.comboBox_settingname.blockSignals(False)
 
 
     def settingname_updated(self):
+        experimentname = self.comboBox_expname.currentText()
         settingname = self.comboBox_settingname.currentText()
-        setting = self.settings[settingname]
-        # settinglist = [item for item in setting]
+        setting = self.settings[experimentname][settingname]
         
         settingliststr = ""
 
@@ -114,12 +159,29 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.settings_elements.setText(settingliststr)
         self.lineEdit_settingname.setText(settingname)
 
+        #Update gate calculator
         self.lineEdit_gatestart.setText(str(int(setting['GatingSequentialStartingGate_Delay'])))
         #self.lineEdit_gateend.setText(setting['GatingSequentialEndingGate_Delay'])
         self.lineEdit_gatewidth.setText(str(int(setting['GatingSequentialStartingGate_Width'])))
         self.lineEdit_numframes.setText(str(int(setting['NumFrames'])))
         self.calc_gateparams()
 
+    def send_settings(self,expstr):
+        #Send settings to experiment
+        experimentname = self.comboBox_expname.currentText()
+        experiment = self.expdict[experimentname]
+        settingname = self.comboBox_settingname.currentText()
+        setting = self.settings[experimentname][settingname]
+        lf.set_settings(experiment.exp,setting)
+
+    def pull_settings(self):
+        #Get settings from experiment
+        experimentname = self.comboBox_expname.currentText()
+        experiment = self.expdict[experimentname]
+        setting = lf.get_settings(experiment.exp)
+        settingname = self.comboBox_settingname.currentText()
+        self.settings[experimentname][settingname] = setting
+        self.settingname_updated()
 
 
     def calc_gateparams(self):
@@ -132,39 +194,22 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.lineEdit_gateend.setText(str(end))
 
     def update_gateparams(self):
+        #Puts calculated gate params into internal setting, does not send to experiment. 
+        experimentname = self.comboBox_expname.currentText()
         settingname = self.comboBox_settingname.currentText()
-        self.settings[settingname]['GatingSequentialStartingGate_Delay'] =  int(self.lineEdit_gatestart.text())
-        self.settings[settingname]['GatingSequentialStartingGate_Width'] =  int(self.lineEdit_gatewidth.text())
-        self.settings[settingname]['GatingSequentialEndingGate_Delay'] =  int(self.lineEdit_gateend.text())
-        self.settings[settingname]['GatingSequentialEndingGate_Width'] =  int(self.lineEdit_gatewidth.text())
-        self.settings[settingname]['NumFrames'] =  int(self.lineEdit_numframes.text())
+        self.settings[experimentname][settingname]['GatingSequentialStartingGate_Delay'] =  int(self.lineEdit_gatestart.text())
+        self.settings[experimentname][settingname]['GatingSequentialStartingGate_Width'] =  int(self.lineEdit_gatewidth.text())
+        self.settings[experimentname][settingname]['GatingSequentialEndingGate_Delay'] =  int(self.lineEdit_gateend.text())
+        self.settings[experimentname][settingname]['GatingSequentialEndingGate_Width'] =  int(self.lineEdit_gatewidth.text())
+        self.settings[experimentname][settingname]['NumFrames'] =  int(self.lineEdit_numframes.text())
         self.settingname_updated()
 
-    def send_settings(self,expstr):
-        if hasattr(self,expstr):
-            if expstr == "exp1":
-                experiment = self.exp1.exp
-            elif expstr == "exp2":
-                experiment = self.exp2.exp
-            settingname = self.comboBox_settingname.currentText()
-            setting = self.settings[settingname]
-            lf.set_settings(experiment,setting)
-
-    def pull_settings(self,expstr):
-        if hasattr(self,expstr):
-            if expstr == "exp1":
-                experiment = self.exp1.exp
-            elif expstr == "exp2":
-                experiment = self.exp2.exp
-            setting = lf.get_settings(experiment)
-            settingname = self.comboBox_settingname.currentText()
-            self.settings[settingname] = setting
-            self.settingname_updated()
-
     def newsetting(self):
+        #Copy the current setting to a new item in the dict
         cursettingname = self.comboBox_settingname.currentText()
         newsettingname = self.lineEdit_settingname.text()
-        self.settings[newsettingname] = self.settings[cursettingname]
+        experimentname = self.comboBox_expname.currentText()
+        self.settings[experimentname][newsettingname] = self.settings[experimentname][cursettingname]
         num = self.comboBox_settingname.count()
         self.comboBox_settingname.insertItem(num,newsettingname)
         self.comboBox_settingname.setCurrentIndex(num)
@@ -173,24 +218,10 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         with open(self.settingspath , 'w') as fp:
             json.dump(self.settings, fp)
         self.load_settings()
-
-    def load_settings(self):
-        with open(self.settingspath,'r') as fileread:
-            try:
-                self.settings = json.load(fileread)
-
-                self.comboBox_settingname.blockSignals(True)
-                self.comboBox_settingname.clear()
-                self.comboBox_settingname.insertItems(0,self.settings.keys())
-                self.settingname_updated()
-                self.comboBox_settingname.blockSignals(False)
-                
-            except json.decoder.JSONDecodeError:
-                print('Could not read settings')
-                self.settings = {}
-        
+        self.experimentname_updated()
 
     def continuousacq(self):
+        #Start a logging thread which constantly restarts acquisition. 
         if(self.radioButton_contacq.isChecked()):
             self.lt = lf.LoggingThread(self.exp2.exp)
             self.lt.start()
