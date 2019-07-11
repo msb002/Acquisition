@@ -89,6 +89,10 @@ The VI template must contain the following controls (names must match exactly):
 
 ### Adding a new instrument VI
 
+New VIs for general instruments should go into the `Instruments` folder. 
+
+To add logging to a new VI, use `Common SubVis\GenerateFilePaths.Vi`. This will automatically generate a filepath based on a set of input parameters. Typically just give the filename and set the logfile input to true. Then wire this to a tdms open (in the labview file I/O pallette) with the 'operation' input set to 'open/create'. Then save the data in a for loop with TDMS write and then use TDMS flush to write the data to disk. Finally, outside the for loop use TDMS close to close the file. 
+
 ### Adding a new visualization VI
 Data should be sent to the visualization VI using Queues just obtain a queue with the same name in both your data acquisition VI and visualization VI. Make sure to set a limit on the queue so there is not endless storage of data in the RAM if the visualization VI is not running.  *(see HVOF visulization to see how this works)*
 
