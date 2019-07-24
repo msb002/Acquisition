@@ -12,7 +12,7 @@
 		<Property Name="server.vi.callsEnabled" Type="Bool">true</Property>
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
-		<Item Name="PyrometerSetup.vi" Type="VI" URL="../PyrometerSetup.vi"/>
+		<Item Name="PyrometerSettings.vi" Type="VI" URL="../PyrometerSettings.vi"/>
 		<Item Name="Dependencies" Type="Dependencies">
 			<Item Name="instr.lib" Type="Folder">
 				<Item Name="FilterWheel102_win32.dll" Type="Document" URL="/&lt;instrlib&gt;/Thorlabs_FW102C/Library/FilterWheel102_win32.dll"/>
