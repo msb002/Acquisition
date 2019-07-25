@@ -131,19 +131,19 @@ class LFexp():
 
 
 class LFMonitorThread(threading.Thread):
-    def __init__(self,explist, logfilearr):
+    def __init__(self,mainwindow):
         threading.Thread.__init__(self)
-        self.explist= explist 
+        self.exparr= mainwindow.exparr 
         self.runthread = True
-        self.logfilearr = logfilearr
+        self.logfilearr = mainwindow.logfilearr
         self.runningdict = {}
-        for exp in explist:
+        for exp in self.exparr:
             self.runningdict[exp] = exp.exp.IsRunning
 
     def run(self):
         self.LabVIEW = win32com.client.Dispatch("Labview.Application") # when start is called a new thread is created and the COM object must be created in that thread
         self.fileinfo = ""
-        for i, exp in enumerate(self.explist):
+        for i, exp in enumerate(self.exparr):
             logfile = self.logfilearr[i]
             filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
             folder = os.path.split(filepath)[0]
@@ -164,7 +164,7 @@ class LFMonitorThread(threading.Thread):
             self.fileinfonew = mhdpy.daq.get_fileinfo(self.LabVIEW )
             if(self.fileinfonew != self.fileinfo):
                 self.fileinfo = self.fileinfonew
-                for i, exp in enumerate(self.explist):
+                for i, exp in enumerate(self.exparr):
                     logfile = self.logfilearr[i]
                     if not logfile:
                         if exp.exp.IsRunning:
@@ -184,7 +184,7 @@ class LFMonitorThread(threading.Thread):
                         exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
 
             #check if the experiments have changed their running state and write to the eventlog
-            for exp in self.explist:
+            for exp in self.exparr:
                 if(exp.exp.IsRunning != self.runningdict[exp]):
                     self.runningdict[exp] = exp.exp.IsRunning
                     self.eventlogwriter.SavingVIsChange("LFpython_" + exp.exp.Name,exp.exp.IsRunning)

@@ -105,24 +105,23 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         exp1name = self.comboBox_exp1.currentText()
         exp2name = self.comboBox_exp2.currentText()
         
-        logfilearr = [] #Whether LF instances are set to 'logging' mode
+        self.logfilearr = [] #Whether LF instances are set to 'logging' mode
 
         #TODO: get rid of this list by using dict.items()
-        exparr = [] 
+        self.exparr = [] 
         self.expdict = {}
         if(exp1name != ""): 
-            logfilearr.append(bool(self.checkBox_logfileexp1.checkState()))
+            self.logfilearr.append(bool(self.checkBox_logfileexp1.checkState()))
             self.exp1 = lf.LFexp(exp1name)
-            exparr.append(self.exp1)
+            self.exparr.append(self.exp1)
             self.expdict[exp1name] = self.exp1
         if(exp2name != ""):
-            logfilearr.append(bool(self.checkBox_logfileexp2.checkState()))
+            self.logfilearr.append(bool(self.checkBox_logfileexp2.checkState()))
             self.exp2 = lf.LFexp(exp2name)
-            exparr.append(self.exp2)
+            self.exparr.append(self.exp2)
             self.expdict[exp2name] = self.exp2
-
         #Start monitor threads which monitor filename changes and write to the eventlog
-        lfthread = lf.LFMonitorThread(exparr,logfilearr)
+        lfthread = lf.LFMonitorThread(self)
         lfthread.start()
         
         for experimentname in self.expdict.keys():
