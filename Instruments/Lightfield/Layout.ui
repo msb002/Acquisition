@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>489</width>
-    <height>314</height>
+    <height>308</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -357,17 +357,20 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_contacq">
+   <widget class="QRadioButton" name="radioButton_contacq_exp2">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>230</x>
       <y>270</y>
-      <width>191</width>
+      <width>171</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
      <string>Continuous Acquisition Exp 2</string>
+    </property>
+    <property name="autoExclusive">
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_load">
@@ -417,6 +420,22 @@
     </property>
     <property name="text">
      <string>Experiment</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="radioButton_contacq_exp1">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>270</y>
+      <width>161</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Continuous Acquisition Exp 1</string>
+    </property>
+    <property name="autoExclusive">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>

@@ -64,7 +64,9 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.pushButton_load.clicked.connect(self.load_button)
         self.pushButton_newsetting.clicked.connect(self.newsetting)
 
-        self.radioButton_contacq.released.connect(self.continuousacq)
+        #TODO: make this a lambda function passing the experiment
+        self.radioButton_contacq_exp1.released.connect(self.continuousacq_exp1)
+        self.radioButton_contacq_exp2.released.connect(self.continuousacq_exp2)
 
         self.comboBox_settingname.currentIndexChanged.connect(self.settingname_updated)
         self.comboBox_expname.currentIndexChanged.connect(self.experimentname_updated)
@@ -220,16 +222,23 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.load_settings()
         self.experimentname_updated()
 
-    def continuousacq(self):
+    def continuousacq_exp1(self):
         #Start a logging thread which constantly restarts acquisition. 
-        if(self.radioButton_contacq.isChecked()):
+        if(self.radioButton_contacq_exp1.isChecked()):
+            self.lt = lf.LoggingThread(self.exp1.exp)
+            self.lt.start()
+        else:
+            self.lt.logging = False
+            self.exp1.exp.Stop()
+
+    def continuousacq_exp2(self):
+        #Start a logging thread which constantly restarts acquisition. 
+        if(self.radioButton_contacq_exp2.isChecked()):
             self.lt = lf.LoggingThread(self.exp2.exp)
             self.lt.start()
         else:
             self.lt.logging = False
             self.exp2.exp.Stop()
-
-
 
     
 app = QtWidgets.QApplication(sys.argv)
