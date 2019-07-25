@@ -208,18 +208,38 @@ class LFMonitorThread(threading.Thread):
         self.runthread = False
 
 class LoggingThread(threading.Thread):
-    def __init__(self,experiment,sleeptime):
+    def __init__(self,mainwindow,experiment='exp1'):
         threading.Thread.__init__(self)
-        self.experiment = experiment
-        self.sleeptime = sleeptime
+
+        if experiment == 'exp1':
+            self.experiment = mainwindow.exp1.exp
+            self.sleeptime = int(mainwindow.lineEdit_contacqdelay_exp1.text())
+            self.numacq = int(mainwindow.lineEdit_contacqnum_exp1.text())
+            self.radiobutton = mainwindow.radioButton_contacq_exp1
+
+        if experiment == 'exp2':
+            self.experiment = mainwindow.exp2.exp
+            self.sleeptime = int(mainwindow.lineEdit_contacqdelay_exp2.text())
+            self.numacq = int(mainwindow.lineEdit_contacqnum_exp2.text())
+            self.radiobutton = mainwindow.radioButton_contacq_exp2
+
         self.logging = False
 
     def run(self):
         self.logging = True
+
+        i = 0
         while(self.logging):
             self.experiment.Acquire()
             while(self.experiment.IsRunning):
                 time.sleep(0.1)
+
+            i = i + 1
+            
+            if i >= self.numacq and self.numacq != 0:
+                self.radiobutton.setChecked(False)
+                self.logging = False
+            
             if self.logging:
                 #only sleep if logging is still going (i.e. was not canceled by test case change)
                 time.sleep(self.sleeptime)

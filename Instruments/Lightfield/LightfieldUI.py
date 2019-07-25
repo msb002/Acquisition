@@ -61,6 +61,8 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.pushButton_pull.clicked.connect(self.pull_settings)
         self.pushButton_send.clicked.connect(self.send_settings)
 
+        self.pushButton_startboth.clicked.connect(self.startboth)
+
         self.pushButton_calcgate.clicked.connect(self.calc_gateparams)
         self.pushButton_updategate.clicked.connect(self.update_gateparams)
         self.pushButton_save.clicked.connect(self.save_settings)
@@ -227,8 +229,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
     def continuousacq_exp1(self):
         #Start a logging thread which constantly restarts acquisition. 
         if(self.radioButton_contacq_exp1.isChecked()):
-            
-            self.lt_exp1 = lf.LoggingThread(self.exp1.exp, int(self.lineEdit_contacqdelay_exp2.text()))
+            self.lt_exp1 = lf.LoggingThread(self, 'exp1')
             self.lt_exp1.start()
         else:
             self.lt_exp1.logging = False
@@ -237,12 +238,18 @@ class Ui_MainWindow(layout.Ui_MainWindow):
     def continuousacq_exp2(self):
         #Start a logging thread which constantly restarts acquisition. 
         if(self.radioButton_contacq_exp2.isChecked()):
-            self.lt_exp2 = lf.LoggingThread(self.exp2.exp, int(self.lineEdit_contacqdelay_exp2.text()))
+            self.lt_exp2 = lf.LoggingThread(self, 'exp2')
             self.lt_exp2.start()
         else:
             self.lt_exp2.logging = False
             self.exp2.exp.Stop()
 
+
+    def startboth(self):
+        self.radioButton_contacq_exp1.click()
+        self.radioButton_contacq_exp2.click()
+        # self.continuousacq_exp1()
+        # self.continuousacq_exp2()
     
 app = QtWidgets.QApplication(sys.argv)
 
