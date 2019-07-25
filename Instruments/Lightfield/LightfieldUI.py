@@ -55,6 +55,9 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.lineEdit_numframes.setValidator(validator)
         self.lineEdit_gatewidth.setValidator(validator)
 
+        self.lineEdit_contacqdelay_exp1.setValidator(validator)
+        self.lineEdit_contacqdelay_exp2.setValidator(validator)
+
         self.pushButton_pull.clicked.connect(self.pull_settings)
         self.pushButton_send.clicked.connect(self.send_settings)
 
@@ -225,7 +228,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         #Start a logging thread which constantly restarts acquisition. 
         if(self.radioButton_contacq_exp1.isChecked()):
             
-            self.lt_exp1 = lf.LoggingThread(self.exp1.exp)
+            self.lt_exp1 = lf.LoggingThread(self.exp1.exp, int(self.lineEdit_contacqdelay_exp2.text()))
             self.lt_exp1.start()
         else:
             self.lt_exp1.logging = False
@@ -234,7 +237,7 @@ class Ui_MainWindow(layout.Ui_MainWindow):
     def continuousacq_exp2(self):
         #Start a logging thread which constantly restarts acquisition. 
         if(self.radioButton_contacq_exp2.isChecked()):
-            self.lt_exp2 = lf.LoggingThread(self.exp2.exp)
+            self.lt_exp2 = lf.LoggingThread(self.exp2.exp, int(self.lineEdit_contacqdelay_exp2.text()))
             self.lt_exp2.start()
         else:
             self.lt_exp2.logging = False

@@ -208,9 +208,10 @@ class LFMonitorThread(threading.Thread):
         self.runthread = False
 
 class LoggingThread(threading.Thread):
-    def __init__(self,experiment):
+    def __init__(self,experiment,sleeptime):
         threading.Thread.__init__(self)
         self.experiment = experiment
+        self.sleeptime = sleeptime
         self.logging = False
 
     def run(self):
@@ -219,6 +220,10 @@ class LoggingThread(threading.Thread):
             self.experiment.Acquire()
             while(self.experiment.IsRunning):
                 time.sleep(0.1)
+            if self.logging:
+                #only sleep if logging is still going (i.e. was not canceled by test case change)
+                time.sleep(self.sleeptime)
+            
 
 
     
