@@ -224,19 +224,20 @@ class Ui_MainWindow(layout.Ui_MainWindow):
     def continuousacq_exp1(self):
         #Start a logging thread which constantly restarts acquisition. 
         if(self.radioButton_contacq_exp1.isChecked()):
-            self.lt = lf.LoggingThread(self.exp1.exp)
-            self.lt.start()
+            
+            self.lt_exp1 = lf.LoggingThread(self.exp1.exp)
+            self.lt_exp1.start()
         else:
-            self.lt.logging = False
+            self.lt_exp1.logging = False
             self.exp1.exp.Stop()
 
     def continuousacq_exp2(self):
         #Start a logging thread which constantly restarts acquisition. 
         if(self.radioButton_contacq_exp2.isChecked()):
-            self.lt = lf.LoggingThread(self.exp2.exp)
-            self.lt.start()
+            self.lt_exp2 = lf.LoggingThread(self.exp2.exp)
+            self.lt_exp2.start()
         else:
-            self.lt.logging = False
+            self.lt_exp2.logging = False
             self.exp2.exp.Stop()
 
     

@@ -133,6 +133,9 @@ class LFexp():
 class LFMonitorThread(threading.Thread):
     def __init__(self,mainwindow):
         threading.Thread.__init__(self)
+
+        self.mainwindow = mainwindow
+        #TODO: Change exparr and logfilearr to just use mainwindow
         self.exparr= mainwindow.exparr 
         self.runthread = True
         self.logfilearr = mainwindow.logfilearr
@@ -172,6 +175,16 @@ class LFMonitorThread(threading.Thread):
                             """After some research I will have to switch this to a QtThread in order to send messages to the main window. So just stopping the experiment for now."""
                             exp.exp.Stop()
                             #The experiment takes a bit of time to stop so this while loop makes sure it is stopped before attempting to change the file name.
+
+                            #Quick fix, just shut down both experiments
+                            if self.mainwindow.radioButton_contacq_exp1.isChecked():
+                                self.mainwindow.radioButton_contacq_exp1.setChecked(False)
+                                self.mainwindow.lt_exp1.logging = False
+
+                            if self.mainwindow.radioButton_contacq_exp2.isChecked():
+                                self.mainwindow.radioButton_contacq_exp2.setChecked(False)
+                                self.mainwindow.lt_exp2.logging = False
+
                             time.sleep(1)
                             while exp.exp.IsRunning:
                                 print('Experiment not stopped yet...')
