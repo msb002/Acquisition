@@ -131,19 +131,22 @@ class LFexp():
 
 
 class LFMonitorThread(threading.Thread):
-    def __init__(self,explist, logfilearr):
+    def __init__(self,mainwindow):
         threading.Thread.__init__(self)
-        self.explist= explist 
+
+        self.mainwindow = mainwindow
+        #TODO: Change exparr and logfilearr to just use mainwindow
+        self.exparr= mainwindow.exparr 
         self.runthread = True
-        self.logfilearr = logfilearr
+        self.logfilearr = mainwindow.logfilearr
         self.runningdict = {}
-        for exp in explist:
+        for exp in self.exparr:
             self.runningdict[exp] = exp.exp.IsRunning
 
     def run(self):
         self.LabVIEW = win32com.client.Dispatch("Labview.Application") # when start is called a new thread is created and the COM object must be created in that thread
         self.fileinfo = ""
-        for i, exp in enumerate(self.explist):
+        for i, exp in enumerate(self.exparr):
             logfile = self.logfilearr[i]
             filepath = mhdpy.daq.gen_filepath(self.LabVIEW , exp.name,'', DAQmx = False, Logfile= logfile)
             folder = os.path.split(filepath)[0]
@@ -164,7 +167,7 @@ class LFMonitorThread(threading.Thread):
             self.fileinfonew = mhdpy.daq.get_fileinfo(self.LabVIEW )
             if(self.fileinfonew != self.fileinfo):
                 self.fileinfo = self.fileinfonew
-                for i, exp in enumerate(self.explist):
+                for i, exp in enumerate(self.exparr):
                     logfile = self.logfilearr[i]
                     if not logfile:
                         if exp.exp.IsRunning:
@@ -172,6 +175,16 @@ class LFMonitorThread(threading.Thread):
                             """After some research I will have to switch this to a QtThread in order to send messages to the main window. So just stopping the experiment for now."""
                             exp.exp.Stop()
                             #The experiment takes a bit of time to stop so this while loop makes sure it is stopped before attempting to change the file name.
+
+                            #Quick fix, just shut down both experiments
+                            if self.mainwindow.radioButton_contacq_exp1.isChecked():
+                                self.mainwindow.radioButton_contacq_exp1.setChecked(False)
+                                self.mainwindow.lt_exp1.logging = False
+
+                            if self.mainwindow.radioButton_contacq_exp2.isChecked():
+                                self.mainwindow.radioButton_contacq_exp2.setChecked(False)
+                                self.mainwindow.lt_exp2.logging = False
+
                             time.sleep(1)
                             while exp.exp.IsRunning:
                                 print('Experiment not stopped yet...')
@@ -184,7 +197,7 @@ class LFMonitorThread(threading.Thread):
                         exp.exp.SetValue(ExperimentSettings.FileNameGenerationBaseFileName,filename)
 
             #check if the experiments have changed their running state and write to the eventlog
-            for exp in self.explist:
+            for exp in self.exparr:
                 if(exp.exp.IsRunning != self.runningdict[exp]):
                     self.runningdict[exp] = exp.exp.IsRunning
                     self.eventlogwriter.SavingVIsChange("LFpython_" + exp.exp.Name,exp.exp.IsRunning)
@@ -195,17 +208,42 @@ class LFMonitorThread(threading.Thread):
         self.runthread = False
 
 class LoggingThread(threading.Thread):
-    def __init__(self,experiment):
+    def __init__(self,mainwindow,experiment='exp1'):
         threading.Thread.__init__(self)
-        self.experiment = experiment
+
+        if experiment == 'exp1':
+            self.experiment = mainwindow.exp1.exp
+            self.sleeptime = int(mainwindow.lineEdit_contacqdelay_exp1.text())
+            self.numacq = int(mainwindow.lineEdit_contacqnum_exp1.text())
+            self.radiobutton = mainwindow.radioButton_contacq_exp1
+
+        if experiment == 'exp2':
+            self.experiment = mainwindow.exp2.exp
+            self.sleeptime = int(mainwindow.lineEdit_contacqdelay_exp2.text())
+            self.numacq = int(mainwindow.lineEdit_contacqnum_exp2.text())
+            self.radiobutton = mainwindow.radioButton_contacq_exp2
+
         self.logging = False
 
     def run(self):
         self.logging = True
+
+        i = 0
         while(self.logging):
             self.experiment.Acquire()
             while(self.experiment.IsRunning):
                 time.sleep(0.1)
+
+            i = i + 1
+            
+            if i >= self.numacq and self.numacq != 0:
+                self.radiobutton.setChecked(False)
+                self.logging = False
+            
+            if self.logging:
+                #only sleep if logging is still going (i.e. was not canceled by test case change)
+                time.sleep(self.sleeptime)
+            
 
 
     
