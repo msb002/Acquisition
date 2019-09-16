@@ -9,7 +9,7 @@
 2. Open the Acquisition folder
 2. Open the 'Common SubVis' folder in windows and double click to run `Setup_GlobalVariable.vi`. This will update the repository path that labview uses, which is contained within `GlobalVariables.vi`. 
 3. Run `Monitor.vi` in the main Acquisition folder to confirm that everything is setup correctly. 
-     * If you get an error saying that the python installation is not a valid excectable, the python integration toolkit is not using the correct python. In Labview, go to Tools -> Python Integration Toolkit -> Select Default python. Select the Python in the py36 anaconda environment, located at `C:\ProgramData\Anaconda3\envs\py36\python.exe`. See [LabSetup](https://github.com/MHDLab/Documentation/blob/master/labsetup.md) for more information. 
+     * If you find an error, it is likely due to not having the i3 JSON package isntalled for labview. Open the VI Package Manager, search i3 JSON, and install. This will add the JSON writer package to your labview.(https://github.com/MHDLab/Documentation/blob/master/labsetup.md) for more information. 
 
 # Usage
 
