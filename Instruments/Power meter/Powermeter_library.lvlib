@@ -6,11 +6,11 @@
 	<Property Name="NI.LV.All.SourceOnly" Type="Bool">false</Property>
 	<Item Name="Add or Edit Wavelengths.vi" Type="VI" URL="../SubVis/Add or Edit Wavelengths.vi"/>
 	<Item Name="Channel States.ctl" Type="VI" URL="../SubVis/Channel States.ctl"/>
-	<Item Name="Channel Template_array.vit" Type="VI" URL="../Power meter Vis/Channel Template_array.vit"/>
+	<Item Name="Channel Template_array.vit" Type="VI" URL="../SubVis/Channel Template_array.vit"/>
 	<Item Name="Filter out non-nummeric characters.vi" Type="VI" URL="../SubVis/Filter out non-nummeric characters.vi"/>
 	<Item Name="Get Handles for Scan Devices.vi" Type="VI" URL="../SubVis/Get Handles for Scan Devices.vi"/>
 	<Item Name="Get values from Variant.vi" Type="VI" URL="../SubVis/Get values from Variant.vi"/>
-	<Item Name="LV Demo Main.vi" Type="VI" URL="../LV Demo Main.vi"/>
+	<Item Name="Powermeter.vi" Type="VI" URL="../Powermeter.vi"/>
 	<Item Name="Set Handle on Open.vi" Type="VI" URL="../SubVis/Set Handle on Open.vi"/>
 	<Item Name="Stop All Channels streaming.vi" Type="VI" URL="../SubVis/Stop All Channels streaming.vi"/>
 	<Item Name="Time to Day-Hr-Min-Sec-msec.vi" Type="VI" URL="../SubVis/Time to Day-Hr-Min-Sec-msec.vi"/>
