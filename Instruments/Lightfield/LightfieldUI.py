@@ -55,8 +55,13 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.lineEdit_numframes.setValidator(validator)
         self.lineEdit_gatewidth.setValidator(validator)
 
+        self.lineEdit_contacqdelay_exp1.setValidator(validator)
+        self.lineEdit_contacqdelay_exp2.setValidator(validator)
+
         self.pushButton_pull.clicked.connect(self.pull_settings)
         self.pushButton_send.clicked.connect(self.send_settings)
+
+        self.pushButton_startboth.clicked.connect(self.startboth)
 
         self.pushButton_calcgate.clicked.connect(self.calc_gateparams)
         self.pushButton_updategate.clicked.connect(self.update_gateparams)
@@ -64,7 +69,9 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.pushButton_load.clicked.connect(self.load_button)
         self.pushButton_newsetting.clicked.connect(self.newsetting)
 
-        self.radioButton_contacq.released.connect(self.continuousacq)
+        #TODO: make this a lambda function passing the experiment
+        self.radioButton_contacq_exp1.released.connect(self.continuousacq_exp1)
+        self.radioButton_contacq_exp2.released.connect(self.continuousacq_exp2)
 
         self.comboBox_settingname.currentIndexChanged.connect(self.settingname_updated)
         self.comboBox_expname.currentIndexChanged.connect(self.experimentname_updated)
@@ -103,24 +110,23 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         exp1name = self.comboBox_exp1.currentText()
         exp2name = self.comboBox_exp2.currentText()
         
-        logfilearr = [] #Whether LF instances are set to 'logging' mode
+        self.logfilearr = [] #Whether LF instances are set to 'logging' mode
 
         #TODO: get rid of this list by using dict.items()
-        exparr = [] 
+        self.exparr = [] 
         self.expdict = {}
         if(exp1name != ""): 
-            logfilearr.append(bool(self.checkBox_logfileexp1.checkState()))
+            self.logfilearr.append(bool(self.checkBox_logfileexp1.checkState()))
             self.exp1 = lf.LFexp(exp1name)
-            exparr.append(self.exp1)
+            self.exparr.append(self.exp1)
             self.expdict[exp1name] = self.exp1
         if(exp2name != ""):
-            logfilearr.append(bool(self.checkBox_logfileexp2.checkState()))
+            self.logfilearr.append(bool(self.checkBox_logfileexp2.checkState()))
             self.exp2 = lf.LFexp(exp2name)
-            exparr.append(self.exp2)
+            self.exparr.append(self.exp2)
             self.expdict[exp2name] = self.exp2
-
         #Start monitor threads which monitor filename changes and write to the eventlog
-        lfthread = lf.LFMonitorThread(exparr,logfilearr)
+        lfthread = lf.LFMonitorThread(self)
         lfthread.start()
         
         for experimentname in self.expdict.keys():
@@ -220,17 +226,30 @@ class Ui_MainWindow(layout.Ui_MainWindow):
         self.load_settings()
         self.experimentname_updated()
 
-    def continuousacq(self):
+    def continuousacq_exp1(self):
         #Start a logging thread which constantly restarts acquisition. 
-        if(self.radioButton_contacq.isChecked()):
-            self.lt = lf.LoggingThread(self.exp2.exp)
-            self.lt.start()
+        if(self.radioButton_contacq_exp1.isChecked()):
+            self.lt_exp1 = lf.LoggingThread(self, 'exp1')
+            self.lt_exp1.start()
         else:
-            self.lt.logging = False
+            self.lt_exp1.logging = False
+            self.exp1.exp.Stop()
+
+    def continuousacq_exp2(self):
+        #Start a logging thread which constantly restarts acquisition. 
+        if(self.radioButton_contacq_exp2.isChecked()):
+            self.lt_exp2 = lf.LoggingThread(self, 'exp2')
+            self.lt_exp2.start()
+        else:
+            self.lt_exp2.logging = False
             self.exp2.exp.Stop()
 
 
-
+    def startboth(self):
+        self.radioButton_contacq_exp1.click()
+        self.radioButton_contacq_exp2.click()
+        # self.continuousacq_exp1()
+        # self.continuousacq_exp2()
     
 app = QtWidgets.QApplication(sys.argv)
 
